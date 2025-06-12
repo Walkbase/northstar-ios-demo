@@ -1,10 +1,3 @@
-//
-//  Northstar_DemoUITestsLaunchTests.swift
-//  Northstar DemoUITests
-//
-//  Created by Andreas Näsman on 12.6.2025.
-//
-
 import XCTest
 
 final class Northstar_DemoUITestsLaunchTests: XCTestCase {
