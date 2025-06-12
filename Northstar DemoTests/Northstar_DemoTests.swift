@@ -1,10 +1,3 @@
-//
-//  Northstar_DemoTests.swift
-//  Northstar DemoTests
-//
-//  Created by Andreas Näsman on 12.6.2025.
-//
-
 import Testing
 @testable import Northstar_Demo
 
