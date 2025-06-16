@@ -1,0 +1,77 @@
+{
+  "fill-specializations" : [
+    {
+      "value" : "system-light"
+    },
+    {
+      "appearance" : "dark",
+      "value" : {
+        "linear-gradient" : [
+          "srgb:0.00000,0.10254,0.23946,1.00000",
+          "display-p3:0.10506,0.27865,0.64127,1.00000"
+        ]
+      }
+    }
+  ],
+  "groups" : [
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "hard-light"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "plus-lighter"
+        }
+      ],
+      "blur-material" : 0.5,
+      "hidden" : false,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "srgb:0.00000,0.42820,1.00000,1.00000",
+                  "display-p3:0.10506,0.27865,0.64127,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "srgb:0.21511,0.87909,1.00000,1.00000",
+                  "display-p3:0.10506,0.27865,0.64127,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "Constellation.svg",
+          "name" : "Constellation",
+          "opacity" : 1
+        }
+      ],
+      "lighting" : "individual",
+      "opacity" : 1,
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
