@@ -15,6 +15,26 @@
   ],
   "groups" : [
     {
+      "blend-mode" : "normal",
+      "blur-material" : null,
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "2 – Demo.svg",
+          "name" : "2 – Demo"
+        }
+      ],
+      "shadow" : {
+        "kind" : "none",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
       "blend-mode-specializations" : [
         {
           "value" : "hard-light"
@@ -50,8 +70,8 @@
           ],
           "glass" : true,
           "hidden" : false,
-          "image-name" : "Constellation.svg",
-          "name" : "Constellation",
+          "image-name" : "1 – Constellation.svg",
+          "name" : "1 – Constellation",
           "opacity" : 1
         }
       ],
