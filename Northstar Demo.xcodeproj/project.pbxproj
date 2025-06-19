@@ -23,15 +23,44 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E18E6BB22E041EB40022B81A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		E1E6A4FE2E003BA5008C737D /* Northstar Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Northstar Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E6A50B2E003BA6008C737D /* Northstar DemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E6A5152E003BA6008C737D /* Northstar DemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		E18E6BB32E041EB40022B81A /* Exceptions for "Northstar Demo" folder in "Embed Frameworks" phase from "Northstar Demo" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			attributesByRelativePath = {
+				Northstar.framework = (CodeSignOnCopy, RemoveHeadersOnCopy, );
+			};
+			buildPhase = E18E6BB22E041EB40022B81A /* Embed Frameworks */;
+			membershipExceptions = (
+				Northstar.framework,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E1E6A5002E003BA5008C737D /* Northstar Demo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E18E6BB32E041EB40022B81A /* Exceptions for "Northstar Demo" folder in "Embed Frameworks" phase from "Northstar Demo" target */,
+			);
 			path = "Northstar Demo";
 			sourceTree = "<group>";
 		};
@@ -102,6 +131,7 @@
 				E1E6A4FA2E003BA5008C737D /* Sources */,
 				E1E6A4FB2E003BA5008C737D /* Frameworks */,
 				E1E6A4FC2E003BA5008C737D /* Resources */,
+				E18E6BB22E041EB40022B81A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -399,6 +429,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CR78ZDZ2ND;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Northstar\\ Demo",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -432,6 +466,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CR78ZDZ2ND;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Northstar\\ Demo",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

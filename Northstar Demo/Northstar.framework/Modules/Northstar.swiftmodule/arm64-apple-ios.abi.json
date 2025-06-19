@@ -1,0 +1,174 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "Northstar",
+    "printedName": "Northstar",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "Northstar"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Demo",
+        "printedName": "Demo",
+        "children": [
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Demo",
+                "printedName": "Northstar.Demo",
+                "usr": "s:9Northstar4DemoC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:9Northstar4DemoCACycfc",
+            "mangledName": "$s9Northstar4DemoCACycfc",
+            "moduleName": "Northstar",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "greet",
+            "printedName": "greet()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9Northstar4DemoC5greetyyF",
+            "mangledName": "$s9Northstar4DemoC5greetyyF",
+            "moduleName": "Northstar",
+            "isOpen": true,
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "greetNonPublic",
+            "printedName": "greetNonPublic()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9Northstar4DemoC14greetNonPublicyyF",
+            "mangledName": "$s9Northstar4DemoC14greetNonPublicyyF",
+            "moduleName": "Northstar",
+            "isOpen": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:9Northstar4DemoC",
+        "mangledName": "$s9Northstar4DemoC",
+        "moduleName": "Northstar",
+        "isOpen": true,
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "DemoNonPublic",
+        "printedName": "DemoNonPublic",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "greet",
+            "printedName": "greet()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9Northstar13DemoNonPublicC5greetyyF",
+            "mangledName": "$s9Northstar13DemoNonPublicC5greetyyF",
+            "moduleName": "Northstar",
+            "isOpen": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "DemoNonPublic",
+                "printedName": "Northstar.DemoNonPublic",
+                "usr": "s:9Northstar13DemoNonPublicC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:9Northstar13DemoNonPublicCACycfc",
+            "mangledName": "$s9Northstar13DemoNonPublicCACycfc",
+            "moduleName": "Northstar",
+            "implicit": true,
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:9Northstar13DemoNonPublicC",
+        "mangledName": "$s9Northstar13DemoNonPublicC",
+        "moduleName": "Northstar",
+        "isOpen": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": []
+}
