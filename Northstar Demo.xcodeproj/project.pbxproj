@@ -6,7 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E10483F02E0B1DE2001AC875 /* Northstar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E10483ED2E0B1DDF001AC875 /* Northstar.framework */; };
+		E10483F12E0B1DE2001AC875 /* Northstar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E10483ED2E0B1DDF001AC875 /* Northstar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		E10483EC2E0B1DDF001AC875 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E1E6A64B2E030E65008C737D;
+			remoteInfo = Northstar;
+		};
 		E1E6A50C2E003BA6008C737D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E1E6A4F62E003BA5008C737D /* Project object */;
@@ -23,7 +35,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E10483F22E0B1DE2001AC875 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E10483F12E0B1DE2001AC875 /* Northstar.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Northstar.xcodeproj; path = "northstar-ios/Northstar.xcodeproj"; sourceTree = "<group>"; };
 		E1E6A4FE2E003BA5008C737D /* Northstar Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Northstar Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E6A50B2E003BA6008C737D /* Northstar DemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E6A5152E003BA6008C737D /* Northstar DemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E10483F02E0B1DE2001AC875 /* Northstar.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +100,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E10483E02E0B1DDF001AC875 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E10483E22E0B1DDF001AC875 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E10483ED2E0B1DDF001AC875 /* Northstar.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		E1E6A4F52E003BA5008C737D = {
 			isa = PBXGroup;
 			children = (
 				E1E6A5002E003BA5008C737D /* Northstar Demo */,
 				E1E6A50E2E003BA6008C737D /* Northstar DemoTests */,
 				E1E6A5182E003BA6008C737D /* Northstar DemoUITests */,
+				E10483E02E0B1DDF001AC875 /* Frameworks */,
 				E1E6A4FF2E003BA5008C737D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -102,6 +147,7 @@
 				E1E6A4FA2E003BA5008C737D /* Sources */,
 				E1E6A4FB2E003BA5008C737D /* Frameworks */,
 				E1E6A4FC2E003BA5008C737D /* Resources */,
+				E10483F22E0B1DE2001AC875 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -198,6 +244,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E1E6A4FF2E003BA5008C737D /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = E10483E22E0B1DDF001AC875 /* Products */;
+					ProjectRef = E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				E1E6A4FD2E003BA5008C737D /* Northstar Demo */,
@@ -206,6 +258,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		E10483ED2E0B1DDF001AC875 /* Northstar.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Northstar.framework;
+			remoteRef = E10483EC2E0B1DDF001AC875 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E1E6A4FC2E003BA5008C737D /* Resources */ = {
