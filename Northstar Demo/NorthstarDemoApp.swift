@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct Northstar_DemoApp: App {
+struct NorthstarDemoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
