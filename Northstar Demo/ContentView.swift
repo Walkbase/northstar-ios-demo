@@ -3,20 +3,26 @@ import SwiftUI
 
 struct ContentView: View {
     private let positioning = WalkbasePositioning()
-    
+
     @State private var sdkVersion: String?
     @State private var showAlert = false
-    
+    @State private var showLogin = false
+
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
-            Button("SDK test") {
-                positioning.test()
-                sdkVersion = positioning.version()
-                showAlert = true
+            Group {
+                Button("SDK Test") {
+                    positioning.test()
+                    sdkVersion = positioning.version()
+                    showAlert = true
+                }
+                Button("Sign In") {
+                    showLogin = true
+                }
             }
             .padding()
             .background(.blue)
@@ -29,6 +35,9 @@ struct ContentView: View {
             }
         }
         .padding()
+        .sheet(isPresented: $showLogin) {
+            LoginView(showLogin: $showLogin)
+        }
     }
 }
 
