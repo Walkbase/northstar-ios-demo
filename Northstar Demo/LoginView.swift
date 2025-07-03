@@ -43,6 +43,7 @@ struct LoginView: View {
                 LabeledContent {
                     TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
+                        .textContentType(.emailAddress)
                         .textInputAutocapitalization(.never)
                         .submitLabel(.next)
                         .focused($focusedField, equals: .email)
@@ -119,11 +120,13 @@ struct LoginView: View {
             HStack {
                 ZStack {
                     SecureField(label, text: $text)
+                        .textContentType(.password)
                         .opacity(hideInput ? 1 : 0)
                         .focused($focusedField, equals: .secure)
                     TextField(label, text: $text)
                         .autocorrectionDisabled()
                         .keyboardType(.alphabet)
+                        .textContentType(.password)
                         .textInputAutocapitalization(.never)
                         .opacity(hideInput ? 0 : 1)
                         .focused($focusedField, equals: .text)
