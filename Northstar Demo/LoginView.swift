@@ -26,25 +26,37 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
-                SensitiveField(label: "API Key", text: $apiKey)
-                    .submitLabel(.next)
-                    .focused($focusedField, equals: .apiKey)
-                    .onSubmit {
-                        focusedField = .email
-                    }
-                TextField("Email", text: $email)
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                    .submitLabel(.next)
-                    .focused($focusedField, equals: .email)
-                    .onSubmit {
-                        focusedField = .password
-                    }
-                SensitiveField(label: "Password", text: $password)
-                    .focused($focusedField, equals: .password)
-                    .onSubmit {
-                        signIn()
-                    }
+                LabeledContent {
+                    SensitiveField(label: "API Key", text: $apiKey)
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .apiKey)
+                } label: {
+                    Label("", systemImage: "key")
+                }
+                .onSubmit {
+                    focusedField = .email
+                }
+                LabeledContent {
+                    TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .email)
+                } label: {
+                    Label("", systemImage: "envelope")
+                }
+                .onSubmit {
+                    focusedField = .password
+                }
+                LabeledContent {
+                    SensitiveField(label: "Password", text: $password)
+                        .focused($focusedField, equals: .password)
+                } label: {
+                    Label("", systemImage: "lock")
+                }
+                .onSubmit {
+                    signIn()
+                }
                 Button("Sign in") {
                     signIn()
                 }
