@@ -7,8 +7,13 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showAlert = false
-    
-    @FocusState private var isFocused: Bool
+
+    enum Field {
+        case apiKey
+        case email
+        case password
+    }
+    @FocusState private var focusedField: Field?
 
     let buttonRole: ButtonRole = {
         if #available(iOS 26.0, *) {
@@ -22,13 +27,24 @@ struct LoginView: View {
         NavigationStack {
             Form {
                 SensitiveField(label: "API Key", text: $apiKey)
-                    .focused($isFocused)
+                    .submitLabel(.next)
+                    .focused($focusedField, equals: .apiKey)
+                    .onSubmit {
+                        focusedField = .email
+                    }
                 TextField("Email", text: $email)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.none)
-                    .focused($isFocused)
+                    .submitLabel(.next)
+                    .focused($focusedField, equals: .email)
+                    .onSubmit {
+                        focusedField = .password
+                    }
                 SensitiveField(label: "Password", text: $password)
-                    .focused($isFocused)
+                    .focused($focusedField, equals: .password)
+                    .onSubmit {
+                        signIn()
+                    }
                 Button("Sign in") {
                     signIn()
                 }
@@ -98,7 +114,7 @@ struct LoginView: View {
     }
 
     private func signIn() {
-        isFocused = false
+        focusedField = nil
         showAlert = true
     }
 }
