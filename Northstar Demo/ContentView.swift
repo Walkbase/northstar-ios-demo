@@ -36,7 +36,7 @@ struct ContentView: View {
         }
         .padding()
         .sheet(isPresented: $showLogin) {
-            LoginView(showLogin: $showLogin)
+            LoginView()
         }
     }
 }
