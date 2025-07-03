@@ -34,7 +34,7 @@ struct LoginView: View {
                     }
                 TextField("Email", text: $email)
                     .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.none)
+                    .textInputAutocapitalization(.never)
                     .submitLabel(.next)
                     .focused($focusedField, equals: .email)
                     .onSubmit {
@@ -100,7 +100,7 @@ struct LoginView: View {
                     TextField(label, text: $text)
                         .autocorrectionDisabled()
                         .keyboardType(.alphabet)
-                        .textInputAutocapitalization(.none)
+                        .textInputAutocapitalization(.never)
                         .opacity(hideInput ? 0 : 1)
                         .focused($focusedField, equals: .text)
                 }
