@@ -39,6 +39,7 @@ struct LoginView: View {
                 .textCase(.uppercase)
                 .fontWeight(.bold)
             }
+            .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Image(systemName: "chevron.left")
