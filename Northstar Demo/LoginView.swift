@@ -111,6 +111,7 @@ struct LoginView: View {
                             focusedField =
                                 focusedField == .secure ? .text : .secure
                         }
+                        .foregroundStyle(.black)
                 }
             }
         }
