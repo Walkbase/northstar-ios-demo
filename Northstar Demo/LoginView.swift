@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct LoginView: View {
-    @Binding var showLogin: Bool
-    
+    @Environment(\.dismiss) private var dismiss
+
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
@@ -39,22 +39,22 @@ struct LoginView: View {
                 .textCase(.uppercase)
                 .fontWeight(.bold)
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Image(systemName: "chevron.left")
+                        .onTapGesture {
+                            dismiss()
+                        }
+                }
+            }
             .alert("Success", isPresented: $showAlert) {
                 Button("OK", role: buttonRole) {
-                    showLogin = false
+                    dismiss()
                 }
                 .background(.blue)
                 .foregroundStyle(.white)
             } message: {
                 Text("You are now signed in and can now proceed with the demo.")
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Image(systemName: "chevron.left")
-                        .onTapGesture {
-                            showLogin = false
-                        }
-                }
             }
         }
     }
@@ -103,6 +103,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    @Previewable @State var showLogin = true
-    LoginView(showLogin: $showLogin)
+    LoginView()
 }
