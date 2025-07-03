@@ -64,6 +64,9 @@ struct LoginView: View {
                         }
                 }
             }
+            .onAppear {
+                focusedField = .apiKey
+            }
             .alert("Success", isPresented: $showAlert) {
                 Button("OK", role: buttonRole) {
                     dismiss()
