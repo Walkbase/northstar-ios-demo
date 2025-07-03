@@ -33,9 +33,13 @@ struct LoginView: View {
                 } label: {
                     Label("", systemImage: "key")
                 }
+                .onTapGesture {
+                    focusedField = .apiKey
+                }
                 .onSubmit {
                     focusedField = .email
                 }
+
                 LabeledContent {
                     TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
@@ -45,18 +49,26 @@ struct LoginView: View {
                 } label: {
                     Label("", systemImage: "envelope")
                 }
+                .onTapGesture {
+                    focusedField = .email
+                }
                 .onSubmit {
                     focusedField = .password
                 }
+
                 LabeledContent {
                     SensitiveField(label: "Password", text: $password)
                         .focused($focusedField, equals: .password)
                 } label: {
                     Label("", systemImage: "lock")
                 }
+                .onTapGesture {
+                    focusedField = .password
+                }
                 .onSubmit {
                     signIn()
                 }
+
                 Button("Sign in") {
                     signIn()
                 }
