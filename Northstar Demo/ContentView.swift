@@ -20,7 +20,7 @@ struct ContentView: View {
                     sdkVersion = positioning.version()
                     showAlert = true
                 }
-                Button("Sign In") {
+                Button("Set Up") {
                     showLogin = true
                 }
             }
