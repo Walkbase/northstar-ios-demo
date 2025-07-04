@@ -102,6 +102,8 @@ struct LoginView: View {
             }
         }
     }
+    
+    // MARK: Views
 
     private struct SensitiveField: View {
         let label: String
@@ -141,6 +143,8 @@ struct LoginView: View {
             }
         }
     }
+    
+    // MARK: Methods
 
     private func signIn() {
         focusedField = nil
