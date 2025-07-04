@@ -9,9 +9,7 @@ struct LoginView: View {
     @State private var showAlert = false
 
     enum Field {
-        case apiKey
-        case email
-        case password
+        case apiKey, email, password
     }
     @FocusState private var focusedField: Field?
 
@@ -112,8 +110,7 @@ struct LoginView: View {
         @State var hideInput = true
 
         enum Field {
-            case secure
-            case text
+            case secure, text
         }
         @FocusState var focusedField: Field?
 
