@@ -58,6 +58,7 @@ struct LoginView: View {
 
                 LabeledContent {
                     SensitiveField(label: "Password", text: $password)
+                        .submitLabel(.go)
                         .focused($focusedField, equals: .password)
                 } label: {
                     Label("", systemImage: "lock")
