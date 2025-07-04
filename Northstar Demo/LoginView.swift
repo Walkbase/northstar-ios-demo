@@ -103,7 +103,7 @@ struct LoginView: View {
             }
         }
     }
-    
+
     // MARK: Views
 
     private struct SensitiveField: View {
@@ -111,40 +111,38 @@ struct LoginView: View {
         @Binding var text: String
 
         @State var hideInput = true
-
-        enum Field {
-            case secure, text
-        }
-        @FocusState var focusedField: Field?
+        @FocusState var isFocused: Bool
 
         var body: some View {
             HStack {
                 ZStack {
-                    SecureField(label, text: $text)
-                        .textContentType(.password)
-                        .opacity(hideInput ? 1 : 0)
-                        .focused($focusedField, equals: .secure)
-                    TextField(label, text: $text)
-                        .autocorrectionDisabled()
-                        .keyboardType(.alphabet)
-                        .textContentType(.password)
-                        .textInputAutocapitalization(.never)
-                        .opacity(hideInput ? 0 : 1)
-                        .focused($focusedField, equals: .text)
+                    if hideInput {
+                        SecureField(label, text: $text)
+                            .textContentType(.password)
+                            .focused($isFocused)
+                    } else {
+                        TextField(label, text: $text)
+                            .autocorrectionDisabled()
+                            .keyboardType(.alphabet)
+                            .textContentType(.password)
+                            .textInputAutocapitalization(.never)
+                            .focused($isFocused)
+                    }
                 }
                 if !text.isEmpty {
                     Image(systemName: hideInput ? "eye" : "eye.slash")
                         .onTapGesture {
                             hideInput.toggle()
-                            focusedField =
-                                focusedField == .secure ? .text : .secure
+                            DispatchQueue.main.async {
+                                isFocused = true
+                            }
                         }
                         .foregroundStyle(.black)
                 }
             }
         }
     }
-    
+
     // MARK: Methods
 
     private func signIn() {
