@@ -1,14 +1,17 @@
 import SwiftUI
 
 struct LoginView: View {
-    @Binding var showLogin: Bool
-    
+    @Environment(\.dismiss) private var dismiss
+
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
     @State private var showAlert = false
-    
-    @FocusState private var isFocused: Bool
+
+    enum Field {
+        case apiKey, email, password
+    }
+    @FocusState private var focusedField: Field?
 
     let buttonRole: ButtonRole = {
         if #available(iOS 26.0, *) {
@@ -21,14 +24,52 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
-                SensitiveField(label: "API Key", text: $apiKey)
-                    .focused($isFocused)
-                TextField("Email", text: $email)
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.none)
-                    .focused($isFocused)
-                SensitiveField(label: "Password", text: $password)
-                    .focused($isFocused)
+                LabeledContent {
+                    SensitiveField(label: "API Key", text: $apiKey)
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .apiKey)
+                } label: {
+                    Label("", systemImage: "key")
+                }
+                .onTapGesture {
+                    focusedField = .apiKey
+                }
+                .onSubmit {
+                    focusedField = .email
+                }
+
+                LabeledContent {
+                    TextField("Email", text: $email)
+                        .autocorrectionDisabled()
+                        .keyboardType(.emailAddress)
+                        .textContentType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .email)
+                } label: {
+                    Label("", systemImage: "envelope")
+                }
+                .onTapGesture {
+                    focusedField = .email
+                }
+                .onSubmit {
+                    focusedField = .password
+                }
+
+                LabeledContent {
+                    SensitiveField(label: "Password", text: $password)
+                        .submitLabel(.go)
+                        .focused($focusedField, equals: .password)
+                } label: {
+                    Label("", systemImage: "lock")
+                }
+                .onTapGesture {
+                    focusedField = .password
+                }
+                .onSubmit {
+                    signIn()
+                }
+
                 Button("Sign in") {
                     signIn()
                 }
@@ -39,70 +80,77 @@ struct LoginView: View {
                 .textCase(.uppercase)
                 .fontWeight(.bold)
             }
+            .navigationTitle("Setup")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Image(systemName: "chevron.left")
+                        .onTapGesture {
+                            dismiss()
+                        }
+                }
+            }
+            .onAppear {
+                focusedField = .apiKey
+            }
             .alert("Success", isPresented: $showAlert) {
                 Button("OK", role: buttonRole) {
-                    showLogin = false
+                    dismiss()
                 }
                 .background(.blue)
                 .foregroundStyle(.white)
             } message: {
                 Text("You are now signed in and can now proceed with the demo.")
             }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Image(systemName: "chevron.left")
-                        .onTapGesture {
-                            showLogin = false
-                        }
-                }
-            }
         }
     }
+
+    // MARK: Views
 
     private struct SensitiveField: View {
         let label: String
         @Binding var text: String
 
         @State var hideInput = true
-
-        enum Field {
-            case secure
-            case text
-        }
-        @FocusState var focusedField: Field?
+        @FocusState var isFocused: Bool
 
         var body: some View {
             HStack {
                 ZStack {
-                    SecureField(label, text: $text)
-                        .opacity(hideInput ? 1 : 0)
-                        .focused($focusedField, equals: .secure)
-                    TextField(label, text: $text)
-                        .autocorrectionDisabled()
-                        .keyboardType(.alphabet)
-                        .textInputAutocapitalization(.none)
-                        .opacity(hideInput ? 0 : 1)
-                        .focused($focusedField, equals: .text)
+                    if hideInput {
+                        SecureField(label, text: $text)
+                            .textContentType(.password)
+                            .focused($isFocused)
+                    } else {
+                        TextField(label, text: $text)
+                            .autocorrectionDisabled()
+                            .keyboardType(.alphabet)
+                            .textContentType(.password)
+                            .textInputAutocapitalization(.never)
+                            .focused($isFocused)
+                    }
                 }
                 if !text.isEmpty {
                     Image(systemName: hideInput ? "eye" : "eye.slash")
                         .onTapGesture {
                             hideInput.toggle()
-                            focusedField =
-                                focusedField == .secure ? .text : .secure
+                            DispatchQueue.main.async {
+                                isFocused = true
+                            }
                         }
+                        .foregroundStyle(.black)
                 }
             }
         }
     }
 
+    // MARK: Methods
+
     private func signIn() {
-        isFocused = false
+        focusedField = nil
         showAlert = true
     }
 }
 
 #Preview {
-    @Previewable @State var showLogin = true
-    LoginView(showLogin: $showLogin)
+    LoginView()
 }
