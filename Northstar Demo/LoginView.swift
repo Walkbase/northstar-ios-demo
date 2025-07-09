@@ -1,8 +1,16 @@
 import SwiftUI
 
+private let regions = [
+    Region(modifier: "", name: "EU"),
+    Region(modifier: "-uk", name: "UK"),
+    Region(modifier: "-us", name: "US"),
+    Region(modifier: "-dev", name: "Dev"),
+]
+
 struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
 
+    @State private var selectedRegion = regions[0]
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
@@ -24,6 +32,12 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Picker("Region", selection: $selectedRegion) {
+                    ForEach(regions, id: \.name) { region in
+                        Text(region.name).tag(region)
+                    }
+                }.pickerStyle(.segmented)
+
                 LabeledContent {
                     SensitiveField(label: "API Key", text: $apiKey)
                         .submitLabel(.next)
@@ -149,6 +163,13 @@ struct LoginView: View {
         focusedField = nil
         showAlert = true
     }
+}
+
+// MARK: Structs
+
+private struct Region: Hashable {
+    let modifier: String
+    let name: String
 }
 
 #Preview {
