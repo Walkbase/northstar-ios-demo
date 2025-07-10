@@ -14,6 +14,7 @@ struct LoginView: View {
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
+    @State private var isLoading = false
     @State private var showAlert = false
 
     enum Field {
@@ -81,11 +82,18 @@ struct LoginView: View {
                     focusedField = .password
                 }
                 .onSubmit {
-                    signIn()
+                    Task { await submit() }
                 }
 
-                Button("Sign in") {
-                    signIn()
+                Button {
+                    Task { await submit() }
+                } label: {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text("Sign In")
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -159,9 +167,16 @@ struct LoginView: View {
 
     // MARK: Methods
 
-    private func signIn() {
+    private func submit() async {
         focusedField = nil
+        isLoading = true
+        await logIn()
+        isLoading = false
         showAlert = true
+    }
+
+    private func logIn() async {
+        try? await Task.sleep(for: .seconds(2))
     }
 }
 
