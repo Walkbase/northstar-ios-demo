@@ -21,7 +21,7 @@ struct LoginView: View {
     }
     @FocusState private var focusedField: Field?
 
-    let buttonRole: ButtonRole = {
+    let confirm: ButtonRole = {
         if #available(iOS 26.0, *) {
             return .confirm
         } else {
@@ -107,7 +107,7 @@ struct LoginView: View {
                 focusedField = .apiKey
             }
             .alert("Success", isPresented: $showAlert) {
-                Button("OK", role: buttonRole) {
+                Button("OK", role: confirm) {
                     dismiss()
                 }
                 .background(.blue)
