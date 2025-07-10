@@ -16,8 +16,8 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var isLoading = false
-    @State private var showAlert = false
     @State private var isLoggedIn = false
+    @State private var showAlert = false
 
     enum Field {
         case apiKey, email, password
