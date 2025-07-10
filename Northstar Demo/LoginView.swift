@@ -1,3 +1,4 @@
+import Alamofire
 import SwiftUI
 
 private let regions = [
@@ -16,6 +17,7 @@ struct LoginView: View {
     @State private var password = ""
     @State private var isLoading = false
     @State private var showAlert = false
+    @State private var isLoggedIn = false
 
     enum Field {
         case apiKey, email, password
@@ -114,14 +116,23 @@ struct LoginView: View {
             .onAppear {
                 focusedField = .apiKey
             }
-            .alert("Success", isPresented: $showAlert) {
-                Button("OK", role: confirm) {
-                    dismiss()
+            .alert(
+                isLoggedIn ? "Success" : "Something Went Wrong",
+                isPresented: $showAlert
+            ) {
+                Button("OK", role: isLoggedIn ? confirm : .cancel) {
+                    if isLoggedIn {
+                        dismiss()
+                    }
                 }
                 .background(.blue)
                 .foregroundStyle(.white)
             } message: {
-                Text("You are now signed in and can now proceed with the demo.")
+                Text(
+                    isLoggedIn
+                        ? "You are now signed in and can now proceed with the demo."
+                        : "We could not sign you in. Please check your login credentials and chosen environment and try again."
+                )
             }
         }
     }
@@ -176,7 +187,25 @@ struct LoginView: View {
     }
 
     private func logIn() async {
-        try? await Task.sleep(for: .seconds(2))
+        let url = URL(
+            string:
+                "https://analytics\(selectedRegion.modifier).walkbase.com/api/j/login"
+        )!
+        let parameters: Parameters = ["username": email, "password": password]
+        let headers: HTTPHeaders = ["W-SDK-Client-API-Key": apiKey]
+
+        let response = await AF.request(
+            url,
+            method: .post,
+            parameters: parameters,
+            headers: headers,
+        ).validate().serializingData().response
+
+        if case .success = response.result {
+            isLoggedIn = true
+        } else {
+            isLoggedIn = false
+        }
     }
 }
 
