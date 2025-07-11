@@ -1,11 +1,22 @@
+import Alamofire
 import SwiftUI
+
+private let regions = [
+    Region(modifier: "", name: "EU"),
+    Region(modifier: "-uk", name: "UK"),
+    Region(modifier: "-us", name: "US"),
+    Region(modifier: "-dev", name: "Dev"),
+]
 
 struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
 
+    @State private var selectedRegion = regions[0]
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
+    @State private var isLoading = false
+    @State private var isLoggedIn = false
     @State private var showAlert = false
 
     enum Field {
@@ -13,7 +24,7 @@ struct LoginView: View {
     }
     @FocusState private var focusedField: Field?
 
-    let buttonRole: ButtonRole = {
+    let confirm: ButtonRole = {
         if #available(iOS 26.0, *) {
             return .confirm
         } else {
@@ -24,6 +35,12 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Picker("Region", selection: $selectedRegion) {
+                    ForEach(regions, id: \.name) { region in
+                        Text(region.name).tag(region)
+                    }
+                }.pickerStyle(.segmented)
+
                 LabeledContent {
                     SensitiveField(label: "API Key", text: $apiKey)
                         .submitLabel(.next)
@@ -67,11 +84,18 @@ struct LoginView: View {
                     focusedField = .password
                 }
                 .onSubmit {
-                    signIn()
+                    Task { await submit() }
                 }
 
-                Button("Sign in") {
-                    signIn()
+                Button {
+                    Task { await submit() }
+                } label: {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text("Sign In")
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -80,7 +104,7 @@ struct LoginView: View {
                 .textCase(.uppercase)
                 .fontWeight(.bold)
             }
-            .navigationTitle("Setup")
+            .navigationTitle("Authentication")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Image(systemName: "chevron.left")
@@ -92,14 +116,23 @@ struct LoginView: View {
             .onAppear {
                 focusedField = .apiKey
             }
-            .alert("Success", isPresented: $showAlert) {
-                Button("OK", role: buttonRole) {
-                    dismiss()
+            .alert(
+                isLoggedIn ? "Success" : "Something Went Wrong",
+                isPresented: $showAlert
+            ) {
+                Button("OK", role: isLoggedIn ? confirm : .cancel) {
+                    if isLoggedIn {
+                        dismiss()
+                    }
                 }
                 .background(.blue)
                 .foregroundStyle(.white)
             } message: {
-                Text("You are now signed in and can now proceed with the demo.")
+                Text(
+                    isLoggedIn
+                        ? "You are now signed in and can now proceed with the demo."
+                        : "We could not sign you in. Please check your login credentials and chosen environment and try again."
+                )
             }
         }
     }
@@ -145,11 +178,45 @@ struct LoginView: View {
 
     // MARK: Methods
 
-    private func signIn() {
+    private func submit() async {
         focusedField = nil
+        isLoading = true
+        await logIn()
+        isLoading = false
         showAlert = true
     }
+
+    private func logIn() async {
+        let url = URL(
+            string:
+                "https://analytics\(selectedRegion.modifier).walkbase.com/api/j/login"
+        )!
+        let parameters: Parameters = ["username": email, "password": password]
+        let headers: HTTPHeaders = ["W-SDK-Client-API-Key": apiKey]
+
+        let response = await AF.request(
+            url,
+            method: .post,
+            parameters: parameters,
+            headers: headers,
+        ).validate().serializingData().response
+
+        if case .success = response.result {
+            isLoggedIn = true
+        } else {
+            isLoggedIn = false
+        }
+    }
 }
+
+// MARK: Structs
+
+private struct Region: Hashable {
+    let modifier: String
+    let name: String
+}
+
+// MARK: Preview
 
 #Preview {
     LoginView()
