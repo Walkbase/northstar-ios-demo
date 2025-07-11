@@ -123,7 +123,7 @@ struct LoginView: View {
                     Text(
                         isLoggedIn
                             ? "You are now signed in and can now proceed with the demo."
-                            : "We could not sign you in. Please check your login credentials and chosen environment and try again."
+                            : "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
                     )
                 }
             }
