@@ -35,74 +35,76 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Picker("Region", selection: $selectedRegion) {
-                    ForEach(regions, id: \.name) { region in
-                        Text(region.name).tag(region)
+                Section("Authentication") {
+                    Picker("Region", selection: $selectedRegion) {
+                        ForEach(regions, id: \.name) { region in
+                            Text(region.name).tag(region)
+                        }
+                    }.pickerStyle(.segmented)
+
+                    LabeledContent {
+                        SensitiveField(label: "API Key", text: $apiKey)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .apiKey)
+                    } label: {
+                        Label("", systemImage: "key")
                     }
-                }.pickerStyle(.segmented)
-
-                LabeledContent {
-                    SensitiveField(label: "API Key", text: $apiKey)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .apiKey)
-                } label: {
-                    Label("", systemImage: "key")
-                }
-                .onTapGesture {
-                    focusedField = .apiKey
-                }
-                .onSubmit {
-                    focusedField = .email
-                }
-
-                LabeledContent {
-                    TextField("Email", text: $email)
-                        .autocorrectionDisabled()
-                        .keyboardType(.emailAddress)
-                        .textContentType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .email)
-                } label: {
-                    Label("", systemImage: "envelope")
-                }
-                .onTapGesture {
-                    focusedField = .email
-                }
-                .onSubmit {
-                    focusedField = .password
-                }
-
-                LabeledContent {
-                    SensitiveField(label: "Password", text: $password)
-                        .submitLabel(.go)
-                        .focused($focusedField, equals: .password)
-                } label: {
-                    Label("", systemImage: "lock")
-                }
-                .onTapGesture {
-                    focusedField = .password
-                }
-                .onSubmit {
-                    Task { await submit() }
-                }
-
-                Button {
-                    Task { await submit() }
-                } label: {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Sign In")
+                    .onTapGesture {
+                        focusedField = .apiKey
                     }
+                    .onSubmit {
+                        focusedField = .email
+                    }
+
+                    LabeledContent {
+                        TextField("Email", text: $email)
+                            .autocorrectionDisabled()
+                            .keyboardType(.emailAddress)
+                            .textContentType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .email)
+                    } label: {
+                        Label("", systemImage: "envelope")
+                    }
+                    .onTapGesture {
+                        focusedField = .email
+                    }
+                    .onSubmit {
+                        focusedField = .password
+                    }
+
+                    LabeledContent {
+                        SensitiveField(label: "Password", text: $password)
+                            .submitLabel(.go)
+                            .focused($focusedField, equals: .password)
+                    } label: {
+                        Label("", systemImage: "lock")
+                    }
+                    .onTapGesture {
+                        focusedField = .password
+                    }
+                    .onSubmit {
+                        Task { await submit() }
+                    }
+
+                    Button {
+                        Task { await submit() }
+                    } label: {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Sign In")
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .textCase(.uppercase)
+                    .fontWeight(.bold)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(.blue)
-                .foregroundStyle(.white)
-                .textCase(.uppercase)
-                .fontWeight(.bold)
             }
             .navigationTitle("Authentication")
             .toolbar {
