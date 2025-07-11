@@ -112,13 +112,9 @@ struct LoginView: View {
                     isLoggedIn ? "Success" : "Something Went Wrong",
                     isPresented: $showAlert
                 ) {
-                    Button("OK", role: isLoggedIn ? confirm : .cancel) {
-                        if isLoggedIn {
-                            dismiss()
-                        }
-                    }
-                    .background(.blue)
-                    .foregroundStyle(.white)
+                    Button("OK", role: isLoggedIn ? confirm : .cancel) {}
+                        .background(.blue)
+                        .foregroundStyle(.white)
                 } message: {
                     Text(
                         isLoggedIn
