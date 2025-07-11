@@ -105,6 +105,27 @@ struct LoginView: View {
                     .textCase(.uppercase)
                     .fontWeight(.bold)
                 }
+                .onAppear {
+                    focusedField = .apiKey
+                }
+                .alert(
+                    isLoggedIn ? "Success" : "Something Went Wrong",
+                    isPresented: $showAlert
+                ) {
+                    Button("OK", role: isLoggedIn ? confirm : .cancel) {
+                        if isLoggedIn {
+                            dismiss()
+                        }
+                    }
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                } message: {
+                    Text(
+                        isLoggedIn
+                            ? "You are now signed in and can now proceed with the demo."
+                            : "We could not sign you in. Please check your login credentials and chosen environment and try again."
+                    )
+                }
             }
             .navigationTitle("Authentication")
             .toolbar {
@@ -114,27 +135,6 @@ struct LoginView: View {
                             dismiss()
                         }
                 }
-            }
-            .onAppear {
-                focusedField = .apiKey
-            }
-            .alert(
-                isLoggedIn ? "Success" : "Something Went Wrong",
-                isPresented: $showAlert
-            ) {
-                Button("OK", role: isLoggedIn ? confirm : .cancel) {
-                    if isLoggedIn {
-                        dismiss()
-                    }
-                }
-                .background(.blue)
-                .foregroundStyle(.white)
-            } message: {
-                Text(
-                    isLoggedIn
-                        ? "You are now signed in and can now proceed with the demo."
-                        : "We could not sign you in. Please check your login credentials and chosen environment and try again."
-                )
             }
         }
     }
