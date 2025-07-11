@@ -127,7 +127,7 @@ struct LoginView: View {
                     )
                 }
             }
-            .navigationTitle("Authentication")
+            .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Image(systemName: "chevron.left")
