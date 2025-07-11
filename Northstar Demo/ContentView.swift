@@ -2,8 +2,6 @@ import Northstar
 import SwiftUI
 
 struct ContentView: View {
-    private let positioning = WalkbasePositioning()
-
     @State private var sdkVersion: String?
     @State private var showAlert = false
     @State private var showLogin = false
@@ -16,8 +14,8 @@ struct ContentView: View {
             Text("Hello, world!")
             Group {
                 Button("SDK Test") {
-                    positioning.test()
-                    sdkVersion = positioning.version()
+                    Positioning.test()
+                    sdkVersion = Positioning.version()
                     showAlert = true
                 }
                 Button("Set Up") {
