@@ -36,6 +36,26 @@ struct LoginView: View {
         NavigationStack {
             Form {
                 Section("Authentication") {
+                    if isLoggedIn {
+                        Label(
+                            "You are signed in.",
+                            systemImage: "checkmark.circle"
+                        )
+                        .padding(8)
+                        .background(Color.green.opacity(0.2))
+                        .foregroundStyle(.green)
+                        .clipShape(.rect(cornerRadius: 8))
+                    } else {
+                        Label(
+                            "You need to sign in.",
+                            systemImage: "info.circle"
+                        )
+                        .padding(8)
+                        .background(Color.blue.opacity(0.2))
+                        .foregroundStyle(.blue)
+                        .clipShape(.rect(cornerRadius: 8))
+                    }
+
                     Picker("Region", selection: $selectedRegion) {
                         ForEach(regions, id: \.name) { region in
                             Text(region.name).tag(region)
