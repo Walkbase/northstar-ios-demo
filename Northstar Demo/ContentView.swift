@@ -23,7 +23,8 @@ struct ContentView: View {
                 Button("Register Device") {
                     Task {
                         await positioning.registerDevice(
-                            apiKey: "8EwLYyygHNWPhK1PxvMJ"
+                            apiKey: "8EwLYyygHNWPhK1PxvMJ",
+                            userID: "northstar-demo"
                         )
                     }
                 }
