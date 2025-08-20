@@ -23,6 +23,13 @@ struct ContentView: View {
                 Button("Set Up") {
                     showLogin = true
                 }
+                Button("Register Device") {
+                    Task {
+                        await positioning.registerDevice(
+                            apiKey: apiKey
+                        )
+                    }
+                }
             }
             .padding()
             .background(.blue)
