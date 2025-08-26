@@ -14,9 +14,6 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Text("Hello, world!")
             Group {
-                Button("SDK Test") {
-                    positioning.test()
-                }
                 Button("Set Up") {
                     showLogin = true
                 }
