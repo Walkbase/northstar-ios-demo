@@ -121,6 +121,7 @@ struct LoginView: View {
                             Text("Sign In")
                         }
                     }
+                    .disabled(isLoading)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.blue)
@@ -165,6 +166,7 @@ struct LoginView: View {
                             Text("Register Device")
                         }
                     }
+                    .disabled(isLoading)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.blue)
