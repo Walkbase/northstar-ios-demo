@@ -1,4 +1,5 @@
 import Alamofire
+import Northstar
 import SwiftUI
 
 private let regions = [
@@ -9,6 +10,8 @@ private let regions = [
 ]
 
 struct LoginView: View {
+    private let positioning = Positioning()
+
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedRegion = regions[0]
@@ -35,76 +38,144 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Picker("Region", selection: $selectedRegion) {
-                    ForEach(regions, id: \.name) { region in
-                        Text(region.name).tag(region)
+                Section("Authentication") {
+                    if isLoggedIn {
+                        Label(
+                            "You are signed in.",
+                            systemImage: "checkmark.circle"
+                        )
+                        .padding(8)
+                        .background(Color.green.opacity(0.2))
+                        .foregroundStyle(.green)
+                        .clipShape(.rect(cornerRadius: 8))
+                    } else {
+                        Label(
+                            "You need to sign in.",
+                            systemImage: "info.circle"
+                        )
+                        .padding(8)
+                        .background(Color.blue.opacity(0.2))
+                        .foregroundStyle(.blue)
+                        .clipShape(.rect(cornerRadius: 8))
                     }
-                }.pickerStyle(.segmented)
 
-                LabeledContent {
-                    SensitiveField(label: "API Key", text: $apiKey)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .apiKey)
-                } label: {
-                    Label("", systemImage: "key")
+                    Picker("Region", selection: $selectedRegion) {
+                        ForEach(regions, id: \.name) { region in
+                            Text(region.name).tag(region)
+                        }
+                    }.pickerStyle(.segmented)
+
+                    LabeledContent {
+                        SensitiveField(label: "API Key", text: $apiKey)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .apiKey)
+                    } label: {
+                        Label("", systemImage: "key")
+                    }
+                    .onTapGesture {
+                        focusedField = .apiKey
+                    }
+                    .onSubmit {
+                        focusedField = .email
+                    }
+
+                    LabeledContent {
+                        TextField("Email", text: $email)
+                            .autocorrectionDisabled()
+                            .keyboardType(.emailAddress)
+                            .textContentType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .email)
+                    } label: {
+                        Label("", systemImage: "envelope")
+                    }
+                    .onTapGesture {
+                        focusedField = .email
+                    }
+                    .onSubmit {
+                        focusedField = .password
+                    }
+
+                    LabeledContent {
+                        SensitiveField(label: "Password", text: $password)
+                            .submitLabel(.go)
+                            .focused($focusedField, equals: .password)
+                    } label: {
+                        Label("", systemImage: "lock")
+                    }
+                    .onTapGesture {
+                        focusedField = .password
+                    }
+                    .onSubmit {
+                        Task { await submit() }
+                    }
+
+                    Button {
+                        Task { await submit() }
+                    } label: {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Sign In")
+                        }
+                    }
+                    .disabled(isLoading)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .textCase(.uppercase)
+                    .fontWeight(.bold)
                 }
-                .onTapGesture {
+                .onAppear {
                     focusedField = .apiKey
                 }
-                .onSubmit {
-                    focusedField = .email
+                .alert(
+                    isLoggedIn ? "Success" : "Something Went Wrong",
+                    isPresented: $showAlert
+                ) {
+                    Button("OK", role: isLoggedIn ? confirm : .cancel) {}
+                        .background(.blue)
+                        .foregroundStyle(.white)
+                } message: {
+                    Text(
+                        isLoggedIn
+                            ? "You are now signed in and can now proceed with the demo."
+                            : "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+                    )
                 }
 
-                LabeledContent {
-                    TextField("Email", text: $email)
-                        .autocorrectionDisabled()
-                        .keyboardType(.emailAddress)
-                        .textContentType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .email)
-                } label: {
-                    Label("", systemImage: "envelope")
-                }
-                .onTapGesture {
-                    focusedField = .email
-                }
-                .onSubmit {
-                    focusedField = .password
-                }
-
-                LabeledContent {
-                    SensitiveField(label: "Password", text: $password)
-                        .submitLabel(.go)
-                        .focused($focusedField, equals: .password)
-                } label: {
-                    Label("", systemImage: "lock")
-                }
-                .onTapGesture {
-                    focusedField = .password
-                }
-                .onSubmit {
-                    Task { await submit() }
-                }
-
-                Button {
-                    Task { await submit() }
-                } label: {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Sign In")
+                Section("Device Registration") {
+                    Button {
+                        Task {
+                            isLoading = true
+                            await positioning.registerDevice(
+                                apiKey: apiKey,
+                                // TODO: Does the casing matter?
+                                userID: "northstar-demo"
+                            )
+                            isLoading = false
+                        }
+                    } label: {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Register Device")
+                        }
                     }
+                    .disabled(isLoading)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .textCase(.uppercase)
+                    .fontWeight(.bold)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(.blue)
-                .foregroundStyle(.white)
-                .textCase(.uppercase)
-                .fontWeight(.bold)
             }
-            .navigationTitle("Authentication")
+            .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Image(systemName: "chevron.left")
@@ -112,27 +183,6 @@ struct LoginView: View {
                             dismiss()
                         }
                 }
-            }
-            .onAppear {
-                focusedField = .apiKey
-            }
-            .alert(
-                isLoggedIn ? "Success" : "Something Went Wrong",
-                isPresented: $showAlert
-            ) {
-                Button("OK", role: isLoggedIn ? confirm : .cancel) {
-                    if isLoggedIn {
-                        dismiss()
-                    }
-                }
-                .background(.blue)
-                .foregroundStyle(.white)
-            } message: {
-                Text(
-                    isLoggedIn
-                        ? "You are now signed in and can now proceed with the demo."
-                        : "We could not sign you in. Please check your login credentials and chosen environment and try again."
-                )
             }
         }
     }
