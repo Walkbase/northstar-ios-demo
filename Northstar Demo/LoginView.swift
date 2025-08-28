@@ -1,4 +1,5 @@
 import Alamofire
+import Northstar
 import SwiftUI
 
 private let regions = [
@@ -9,6 +10,8 @@ private let regions = [
 ]
 
 struct LoginView: View {
+    private let positioning = Positioning()
+
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedRegion = regions[0]
@@ -141,6 +144,33 @@ struct LoginView: View {
                             ? "You are now signed in and can now proceed with the demo."
                             : "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
                     )
+                }
+
+                Section("Device Registration") {
+                    Button {
+                        Task {
+                            isLoading = true
+                            await positioning.registerDevice(
+                                apiKey: apiKey,
+                                // TODO: Does the casing matter?
+                                userID: "northstar-demo"
+                            )
+                            isLoading = false
+                        }
+                    } label: {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Register Device")
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .textCase(.uppercase)
+                    .fontWeight(.bold)
                 }
             }
             .navigationTitle("Setup")
