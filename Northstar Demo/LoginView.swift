@@ -129,9 +129,6 @@ struct LoginView: View {
                     .textCase(.uppercase)
                     .fontWeight(.bold)
                 }
-                .onAppear {
-                    focusedField = .apiKey
-                }
                 .alert(
                     isLoggedIn ? "Success" : "Something Went Wrong",
                     isPresented: $showAlert
@@ -147,23 +144,39 @@ struct LoginView: View {
                     )
                 }
 
-                Section("Device Registration") {
-                    Button {
-                        Task {
-                            isLoading = true
-                            await positioning.registerDevice(
-                                apiKey: apiKey,
-                                // TODO: Does the casing matter?
-                                userID: "northstar-demo"
-                            )
-                            isLoading = false
+                Section("Device") {
+                    Group {
+                        Button {
+                            Task {
+                                isLoading = true
+                                await positioning.registerDevice(
+                                    apiKey: apiKey,
+                                    userID: "northstar-demo"
+                                )
+                                isLoading = false
+                            }
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Register")
+                            }
                         }
-                    } label: {
-                        if isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Register Device")
+
+                        Button {
+                            Task {
+                                await positioning.checkDeviceStatus(
+                                    apiKey: apiKey
+                                )
+                            }
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Check Status")
+                            }
                         }
                     }
                     .disabled(isLoading)
@@ -178,9 +191,15 @@ struct LoginView: View {
             .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: "chevron.left").onTapGesture { dismiss() }
+                }
+
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .padding()
                         .onTapGesture {
-                            dismiss()
+                            focusedField = nil
                         }
                 }
             }
