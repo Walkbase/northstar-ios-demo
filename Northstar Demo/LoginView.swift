@@ -144,23 +144,39 @@ struct LoginView: View {
                     )
                 }
 
-                Section("Device Registration") {
-                    Button {
-                        Task {
-                            isLoading = true
-                            await positioning.registerDevice(
-                                apiKey: apiKey,
-                                // TODO: Does the casing matter?
-                                userID: "northstar-demo"
-                            )
-                            isLoading = false
+                Section("Device") {
+                    Group {
+                        Button {
+                            Task {
+                                isLoading = true
+                                await positioning.registerDevice(
+                                    apiKey: apiKey,
+                                    userID: "northstar-demo"
+                                )
+                                isLoading = false
+                            }
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Register")
+                            }
                         }
-                    } label: {
-                        if isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Register Device")
+
+                        Button {
+                            Task {
+                                await positioning.checkDeviceStatus(
+                                    apiKey: apiKey
+                                )
+                            }
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Check Status")
+                            }
                         }
                     }
                     .disabled(isLoading)
