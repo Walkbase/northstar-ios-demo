@@ -129,9 +129,6 @@ struct LoginView: View {
                     .textCase(.uppercase)
                     .fontWeight(.bold)
                 }
-                .onAppear {
-                    focusedField = .apiKey
-                }
                 .alert(
                     isLoggedIn ? "Success" : "Something Went Wrong",
                     isPresented: $showAlert
@@ -178,9 +175,15 @@ struct LoginView: View {
             .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: "chevron.left").onTapGesture { dismiss() }
+                }
+
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .padding()
                         .onTapGesture {
-                            dismiss()
+                            focusedField = nil
                         }
                 }
             }
