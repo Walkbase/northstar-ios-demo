@@ -166,9 +166,11 @@ struct LoginView: View {
 
                         Button {
                             Task {
+                                isLoading = true
                                 await positioning.checkDeviceStatus(
                                     apiKey: apiKey
                                 )
+                                isLoading = false
                             }
                         } label: {
                             if isLoading {
@@ -176,6 +178,40 @@ struct LoginView: View {
                                     .tint(.white)
                             } else {
                                 Text("Check Status")
+                            }
+                        }
+                    }
+                    .disabled(isLoading)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .textCase(.uppercase)
+                    .fontWeight(.bold)
+                }
+
+                Section("Positioning") {
+                    Group {
+                        Button {
+                            Task {
+                                await positioning.start(using: apiKey)
+                            }
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Start")
+                            }
+                        }
+                        Button {
+                            positioning.stop()
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Stop")
                             }
                         }
                     }
