@@ -472,6 +472,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used for iBeacon advertisement.";
+				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "Used for iBeacon advertisement.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -508,6 +510,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used for iBeacon advertisement.";
+				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "Used for iBeacon advertisement.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
