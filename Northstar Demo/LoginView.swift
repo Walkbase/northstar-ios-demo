@@ -2,19 +2,12 @@ import Alamofire
 import Northstar
 import SwiftUI
 
-private let regions = [
-    Region(modifier: "", name: "EU"),
-    Region(modifier: "-uk", name: "UK"),
-    Region(modifier: "-us", name: "US"),
-    Region(modifier: "-dev", name: "Dev"),
-]
-
 struct LoginView: View {
     private let positioning = Positioning()
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var appData: AppData
 
-    @State private var selectedRegion = regions[0]
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
@@ -59,8 +52,8 @@ struct LoginView: View {
                         .clipShape(.rect(cornerRadius: 8))
                     }
 
-                    Picker("Region", selection: $selectedRegion) {
-                        ForEach(regions, id: \.name) { region in
+                    Picker("Region", selection: $appData.selectedRegion) {
+                        ForEach(appData.regions, id: \.name) { region in
                             Text(region.name).tag(region)
                         }
                     }.pickerStyle(.segmented)
@@ -294,7 +287,7 @@ struct LoginView: View {
     private func logIn() async {
         let url = URL(
             string:
-                "https://analytics\(selectedRegion.modifier).walkbase.com/api/j/login"
+                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"
         )!
         let parameters: Parameters = ["username": email, "password": password]
         let headers: HTTPHeaders = ["W-SDK-Client-API-Key": apiKey]
@@ -312,13 +305,6 @@ struct LoginView: View {
             isLoggedIn = false
         }
     }
-}
-
-// MARK: Structs
-
-private struct Region: Hashable {
-    let modifier: String
-    let name: String
 }
 
 // MARK: Preview
