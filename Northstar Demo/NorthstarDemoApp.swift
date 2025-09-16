@@ -18,7 +18,7 @@ class AppData: ObservableObject {
         Region(modifier: "", name: "EU"),
         Region(modifier: "-uk", name: "UK"),
         Region(modifier: "-us", name: "US"),
-        Region(modifier: "-dev", name: "Dev"),
+        Region(modifier: "-dev", name: "DEV"),
     ]
     @Published var selectedRegion: Region
 
