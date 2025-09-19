@@ -1,14 +1,17 @@
 import Combine
+import Northstar
 import SwiftUI
 
 @main
 struct NorthstarDemoApp: App {
     @StateObject private var appData = AppData()
+    @StateObject private var positioning = Positioning()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(appData)
+                .environmentObject(positioning)
         }
     }
 }

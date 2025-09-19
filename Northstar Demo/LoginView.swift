@@ -3,10 +3,9 @@ import Northstar
 import SwiftUI
 
 struct LoginView: View {
-    private let positioning = Positioning()
-
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appData: AppData
+    @EnvironmentObject private var positioning: Positioning
 
     @State private var apiKey = ""
     @State private var email = ""
