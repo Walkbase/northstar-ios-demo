@@ -309,5 +309,10 @@ struct LoginView: View {
 // MARK: Preview
 
 #Preview {
+    @Previewable @StateObject var appData = AppData()
+    @Previewable @StateObject var positioning = Positioning()
+
     LoginView()
+        .environmentObject(appData)
+        .environmentObject(positioning)
 }
