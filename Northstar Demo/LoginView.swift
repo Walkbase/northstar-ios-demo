@@ -6,7 +6,6 @@ struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appData: AppData
 
-    @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
     @State private var isLoading = false
@@ -57,7 +56,7 @@ struct LoginView: View {
                     }.pickerStyle(.segmented)
 
                     LabeledContent {
-                        SensitiveField(label: "API Key", text: $apiKey)
+                        SensitiveField(label: "API Key", text: $appData.apiKey)
                             .submitLabel(.next)
                             .focused($focusedField, equals: .apiKey)
                     } label: {
@@ -212,7 +211,7 @@ struct LoginView: View {
                 "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"
         )!
         let parameters: Parameters = ["username": email, "password": password]
-        let headers: HTTPHeaders = ["W-SDK-Client-API-Key": apiKey]
+        let headers: HTTPHeaders = ["W-SDK-Client-API-Key": appData.apiKey]
 
         let response = await AF.request(
             url,
