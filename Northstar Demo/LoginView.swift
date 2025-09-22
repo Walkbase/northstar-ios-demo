@@ -5,7 +5,6 @@ import SwiftUI
 struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appData: AppData
-    @EnvironmentObject private var positioning: Positioning
 
     @State private var apiKey = ""
     @State private var email = ""
@@ -135,86 +134,6 @@ struct LoginView: View {
                             : "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
                     )
                 }
-
-                Section("Device") {
-                    Group {
-                        Button {
-                            Task {
-                                isLoading = true
-                                await positioning.registerDevice(
-                                    apiKey: apiKey,
-                                    userID: "northstar-demo"
-                                )
-                                isLoading = false
-                            }
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Register")
-                            }
-                        }
-
-                        Button {
-                            Task {
-                                isLoading = true
-                                await positioning.checkDeviceStatus(
-                                    apiKey: apiKey
-                                )
-                                isLoading = false
-                            }
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Check Status")
-                            }
-                        }
-                    }
-                    .disabled(isLoading)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
-                }
-
-                Section("Positioning") {
-                    Group {
-                        Button {
-                            Task {
-                                await positioning.start(using: apiKey)
-                            }
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Start")
-                            }
-                        }
-                        Button {
-                            positioning.stop()
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Stop")
-                            }
-                        }
-                    }
-                    .disabled(isLoading)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
-                }
             }
             .navigationTitle("Setup")
             .toolbar {
@@ -310,9 +229,7 @@ struct LoginView: View {
 
 #Preview {
     @Previewable @StateObject var appData = AppData()
-    @Previewable @StateObject var positioning = Positioning()
 
     LoginView()
         .environmentObject(appData)
-        .environmentObject(positioning)
 }
