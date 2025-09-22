@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var sdkVersion: String?
     @State private var showLoginView = false
     @State private var showMapView = false
 
