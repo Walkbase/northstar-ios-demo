@@ -2,19 +2,10 @@ import Alamofire
 import Northstar
 import SwiftUI
 
-private let regions = [
-    Region(modifier: "", name: "EU"),
-    Region(modifier: "-uk", name: "UK"),
-    Region(modifier: "-us", name: "US"),
-    Region(modifier: "-dev", name: "Dev"),
-]
-
 struct LoginView: View {
-    private let positioning = Positioning()
-
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var appData: AppData
 
-    @State private var selectedRegion = regions[0]
     @State private var apiKey = ""
     @State private var email = ""
     @State private var password = ""
@@ -59,8 +50,8 @@ struct LoginView: View {
                         .clipShape(.rect(cornerRadius: 8))
                     }
 
-                    Picker("Region", selection: $selectedRegion) {
-                        ForEach(regions, id: \.name) { region in
+                    Picker("Region", selection: $appData.selectedRegion) {
+                        ForEach(appData.regions, id: \.name) { region in
                             Text(region.name).tag(region)
                         }
                     }.pickerStyle(.segmented)
@@ -143,91 +134,15 @@ struct LoginView: View {
                             : "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
                     )
                 }
-
-                Section("Device") {
-                    Group {
-                        Button {
-                            Task {
-                                isLoading = true
-                                await positioning.registerDevice(
-                                    apiKey: apiKey,
-                                    userID: "northstar-demo"
-                                )
-                                isLoading = false
-                            }
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Register")
-                            }
-                        }
-
-                        Button {
-                            Task {
-                                isLoading = true
-                                await positioning.checkDeviceStatus(
-                                    apiKey: apiKey
-                                )
-                                isLoading = false
-                            }
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Check Status")
-                            }
-                        }
-                    }
-                    .disabled(isLoading)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
-                }
-
-                Section("Positioning") {
-                    Group {
-                        Button {
-                            Task {
-                                await positioning.start(using: apiKey)
-                            }
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Start")
-                            }
-                        }
-                        Button {
-                            positioning.stop()
-                        } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Stop")
-                            }
-                        }
-                    }
-                    .disabled(isLoading)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
-                }
             }
             .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Image(systemName: "chevron.left").onTapGesture { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
                 }
 
                 ToolbarItemGroup(placement: .keyboard) {
@@ -294,7 +209,7 @@ struct LoginView: View {
     private func logIn() async {
         let url = URL(
             string:
-                "https://analytics\(selectedRegion.modifier).walkbase.com/api/j/login"
+                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"
         )!
         let parameters: Parameters = ["username": email, "password": password]
         let headers: HTTPHeaders = ["W-SDK-Client-API-Key": apiKey]
@@ -314,15 +229,11 @@ struct LoginView: View {
     }
 }
 
-// MARK: Structs
-
-private struct Region: Hashable {
-    let modifier: String
-    let name: String
-}
-
 // MARK: Preview
 
 #Preview {
+    @Previewable @StateObject var appData = AppData()
+
     LoginView()
+        .environmentObject(appData)
 }

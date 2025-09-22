@@ -1,14 +1,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var sdkVersion: String?
-    @State private var showLogin = false
+    @State private var showLoginView = false
+    @State private var showMapView = false
 
     var body: some View {
         VStack {
             Group {
-                Button("Set Up") {
-                    showLogin = true
+                Button("Show Login") {
+                    showLoginView = true
+                }
+                Button("Show Map") {
+                    showMapView = true
                 }
             }
             .padding()
@@ -17,8 +20,11 @@ struct ContentView: View {
             .clipShape(.capsule)
         }
         .padding()
-        .sheet(isPresented: $showLogin) {
+        .sheet(isPresented: $showLoginView) {
             LoginView()
+        }
+        .sheet(isPresented: $showMapView) {
+            MapView()
         }
     }
 }
