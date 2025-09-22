@@ -1,34 +1,25 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showLoginView = false
-    @State private var showMapView = false
+    @EnvironmentObject private var appData: AppData
 
     var body: some View {
-        VStack {
-            Group {
-                Button("Show Login") {
-                    showLoginView = true
-                }
-                Button("Show Map") {
-                    showMapView = true
-                }
+        ZStack {
+            if appData.isLoggedIn {
+                MapView()
+                    .transition(.move(edge: .trailing))
+            } else {
+                LoginView()
+                    .transition(.move(edge: .leading))
             }
-            .padding()
-            .background(.blue)
-            .foregroundStyle(.white)
-            .clipShape(.capsule)
         }
-        .padding()
-        .sheet(isPresented: $showLoginView) {
-            LoginView()
-        }
-        .sheet(isPresented: $showMapView) {
-            MapView()
-        }
+        .animation(.easeInOut, value: appData.isLoggedIn)
     }
 }
 
 #Preview {
+    @Previewable @StateObject var appData = AppData()
+
     ContentView()
+        .environmentObject(appData)
 }
