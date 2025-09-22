@@ -138,7 +138,11 @@ struct LoginView: View {
             .navigationTitle("Setup")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Image(systemName: "chevron.left").onTapGesture { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
                 }
 
                 ToolbarItemGroup(placement: .keyboard) {
