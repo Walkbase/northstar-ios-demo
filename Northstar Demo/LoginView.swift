@@ -46,7 +46,9 @@ struct LoginView: View {
                     }.pickerStyle(.segmented)
 
                     LabeledContent {
-                        SensitiveField(label: "API Key", text: $appData.apiKey)
+                        TextField("API Key", text: $appData.apiKey)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
                             .submitLabel(.next)
                             .focused($focusedField, equals: .apiKey)
                     } label: {

@@ -147,7 +147,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
                 mapView.addOverlay(
                     MKTileOverlay(urlTemplate: urlTemplate),
-                    level: .aboveRoads
+                    level: .aboveLabels
                 )
 
                 mapView.setCamera(
