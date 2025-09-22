@@ -18,6 +18,7 @@ struct NorthstarDemoApp: App {
 
 class AppData: ObservableObject {
     @Published var apiKey: String = ""
+    @Published var isLoggedIn = false
     @Published var selectedRegion: Region
     let regions = [
         Region(modifier: "", name: "EU"),

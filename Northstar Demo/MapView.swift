@@ -4,7 +4,6 @@ import Northstar
 import SwiftUI
 
 struct MapView: View {
-    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appData: AppData
     @EnvironmentObject private var positioning: Positioning
     @State private var bearing: Double?
@@ -59,7 +58,7 @@ struct MapView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         positioning.stop()
-                        dismiss()
+                        appData.isLoggedIn = false
                     } label: {
                         Image(systemName: "chevron.left")
                     }

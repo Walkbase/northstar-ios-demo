@@ -3,13 +3,11 @@ import Northstar
 import SwiftUI
 
 struct LoginView: View {
-    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appData: AppData
 
     @State private var email = ""
     @State private var password = ""
     @State private var isLoading = false
-    @State private var isLoggedIn = false
     @State private var showAlert = false
 
     enum Field {
@@ -17,19 +15,11 @@ struct LoginView: View {
     }
     @FocusState private var focusedField: Field?
 
-    let confirm: ButtonRole = {
-        if #available(iOS 26.0, *) {
-            return .confirm
-        } else {
-            return .cancel
-        }
-    }()
-
     var body: some View {
         NavigationStack {
             Form {
                 Section("Authentication") {
-                    if isLoggedIn {
+                    if appData.isLoggedIn {
                         Label(
                             "You are signed in.",
                             systemImage: "checkmark.circle"
@@ -120,30 +110,21 @@ struct LoginView: View {
                     .fontWeight(.bold)
                 }
                 .alert(
-                    isLoggedIn ? "Success" : "Something Went Wrong",
+                    "Something Went Wrong",
                     isPresented: $showAlert
                 ) {
-                    Button("OK", role: isLoggedIn ? confirm : .cancel) {}
-                        .background(.blue)
-                        .foregroundStyle(.white)
+                    Button("OK", role: .cancel) {
+                    }
+                    .background(.blue)
+                    .foregroundStyle(.white)
                 } message: {
                     Text(
-                        isLoggedIn
-                            ? "You are now signed in and can now proceed with the demo."
-                            : "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+                        "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
                     )
                 }
             }
-            .navigationTitle("Setup")
+            .navigationTitle("Sign In")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                    }
-                }
-
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Image(systemName: "chevron.down")
@@ -202,7 +183,6 @@ struct LoginView: View {
         isLoading = true
         await logIn()
         isLoading = false
-        showAlert = true
     }
 
     private func logIn() async {
@@ -221,9 +201,10 @@ struct LoginView: View {
         ).validate().serializingData().response
 
         if case .success = response.result {
-            isLoggedIn = true
+            appData.isLoggedIn = true
         } else {
-            isLoggedIn = false
+            appData.isLoggedIn = false
+            showAlert = true
         }
     }
 }
