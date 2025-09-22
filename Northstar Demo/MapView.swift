@@ -18,16 +18,6 @@ struct MapView: View {
                 location: positioning.location,
                 urlTemplate: urlTemplate
             )
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        positioning.stop()
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                    }
-                }
-            }
             .task {
                 // TODO: Handle throws when implemented. (#40)
                 await positioning.registerDevice(
@@ -54,6 +44,16 @@ struct MapView: View {
                                 "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
                             floorID = latestFloorID
                         }
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        positioning.stop()
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
                     }
                 }
             }
