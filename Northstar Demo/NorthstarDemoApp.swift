@@ -17,13 +17,14 @@ struct NorthstarDemoApp: App {
 }
 
 class AppData: ObservableObject {
+    @Published var apiKey: String = ""
+    @Published var selectedRegion: Region
     let regions = [
         Region(modifier: "", name: "EU"),
         Region(modifier: "-uk", name: "UK"),
         Region(modifier: "-us", name: "US"),
         Region(modifier: "-dev", name: "DEV"),
     ]
-    @Published var selectedRegion: Region
 
     init() {
         selectedRegion = regions[0]
