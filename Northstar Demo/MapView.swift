@@ -47,6 +47,14 @@ struct MapView: View {
                     }
                 }
             }
+            // TODO: Improve if we loose our location. (#40)
+            .overlay {
+                if positioning.location == nil && floorID == nil {
+                    ProgressView {
+                        Text("Positioning...")
+                    }
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
