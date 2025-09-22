@@ -7,7 +7,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Group {
-                Button("Set Up") {
+                Button("Show Login") {
                     showLoginView = true
                 }
                 Button("Show Map") {
