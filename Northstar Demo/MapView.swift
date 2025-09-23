@@ -58,6 +58,7 @@ struct MapView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         positioning.stop()
+                        // TODO: Improve navigation. (#48)
                         appData.isLoggedIn = false
                     } label: {
                         Image(systemName: "chevron.left")

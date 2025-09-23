@@ -4,6 +4,7 @@ struct ContentView: View {
     @EnvironmentObject private var appData: AppData
 
     var body: some View {
+        // TODO: Improve navigation. (#48)
         ZStack {
             if appData.isLoggedIn {
                 MapView()
