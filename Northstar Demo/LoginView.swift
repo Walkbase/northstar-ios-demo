@@ -5,8 +5,6 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject private var appData: AppData
 
-    @State private var email = ""
-    @State private var password = ""
     @State private var isLoading = false
     @State private var showAlert = false
 
@@ -62,7 +60,7 @@ struct LoginView: View {
                     }
 
                     LabeledContent {
-                        TextField("Email", text: $email)
+                        TextField("Email", text: $appData.email)
                             .autocorrectionDisabled()
                             .keyboardType(.emailAddress)
                             .textContentType(.emailAddress)
@@ -80,9 +78,12 @@ struct LoginView: View {
                     }
 
                     LabeledContent {
-                        SensitiveField(label: "Password", text: $password)
-                            .submitLabel(.go)
-                            .focused($focusedField, equals: .password)
+                        SensitiveField(
+                            label: "Password",
+                            text: $appData.password
+                        )
+                        .submitLabel(.go)
+                        .focused($focusedField, equals: .password)
                     } label: {
                         Label("", systemImage: "lock")
                     }
@@ -192,7 +193,9 @@ struct LoginView: View {
             string:
                 "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"
         )!
-        let parameters: Parameters = ["username": email, "password": password]
+        let parameters: Parameters = [
+            "username": appData.email, "password": appData.password,
+        ]
         let headers: HTTPHeaders = ["W-SDK-Client-API-Key": appData.apiKey]
 
         let response = await AF.request(
