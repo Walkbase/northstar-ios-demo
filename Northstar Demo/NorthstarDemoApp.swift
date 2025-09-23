@@ -30,6 +30,7 @@ class AppData: ObservableObject {
         Region(modifier: "-dev", name: "DEV"),
     ]
 
+    // TODO: Can we auto-select this based on your location? (#50).
     init() {
         selectedRegion = regions[0]
     }

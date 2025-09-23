@@ -146,6 +146,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 mapView.addAnnotation(annotation)
                 context.coordinator.currentAnnotation = annotation
 
+                // TODO: Zooming in full shows no overlay tiles. (#51)
                 mapView.addOverlay(
                     MKTileOverlay(urlTemplate: urlTemplate),
                     level: .aboveLabels
