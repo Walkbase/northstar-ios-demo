@@ -44,22 +44,6 @@ struct LoginView: View {
                     }.pickerStyle(.segmented)
 
                     LabeledContent {
-                        TextField("API Key", text: $appData.apiKey)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .apiKey)
-                    } label: {
-                        Label("", systemImage: "key")
-                    }
-                    .onTapGesture {
-                        focusedField = .apiKey
-                    }
-                    .onSubmit {
-                        focusedField = .email
-                    }
-
-                    LabeledContent {
                         TextField("Email", text: $appData.email)
                             .autocorrectionDisabled()
                             .keyboardType(.emailAddress)
@@ -82,13 +66,29 @@ struct LoginView: View {
                             label: "Password",
                             text: $appData.password
                         )
-                        .submitLabel(.go)
+                        .submitLabel(.next)
                         .focused($focusedField, equals: .password)
                     } label: {
                         Label("", systemImage: "lock")
                     }
                     .onTapGesture {
                         focusedField = .password
+                    }
+                    .onSubmit {
+                        focusedField = .apiKey
+                    }
+
+                    LabeledContent {
+                        TextField("API Key", text: $appData.apiKey)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.go)
+                            .focused($focusedField, equals: .apiKey)
+                    } label: {
+                        Label("", systemImage: "key")
+                    }
+                    .onTapGesture {
+                        focusedField = .apiKey
                     }
                     .onSubmit {
                         Task { await submit() }
