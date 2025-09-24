@@ -185,6 +185,7 @@ struct LoginView: View {
     }
 
     private func logIn() async {
+        // TODO: Abstract to `appData`. (#53)
         let url = URL(
             string:
                 "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"

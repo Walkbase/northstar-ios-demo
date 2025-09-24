@@ -21,6 +21,7 @@ struct MapView: View {
                 // TODO: Handle throws when implemented. (#40)
                 await positioning.registerDevice(
                     apiKey: appData.apiKey,
+                    // TODO: What casing should we use? (#20, SDK)
                     userID: "northstar-demo"
                 )
                 await positioning.start(using: appData.apiKey)
@@ -39,6 +40,7 @@ struct MapView: View {
                         // TODO: Remove when `fetchFloor` throws. (#41).
                         if let floor {
                             bearing = floor.bearing
+                            // TODO: Abstract to `appData`. (#53)
                             urlTemplate =
                                 "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
                             floorID = latestFloorID
@@ -70,6 +72,7 @@ struct MapView: View {
 
     // TODO: Should throw instead of returning `nil`. (#41).
     private func fetchFloor(using floorID: Int) async -> FloorResponse? {
+        // TODO: Abstract to `appData`. (#53)
         let response = await AF.request(
             "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/floors/v2/\(floorID)"
         )
@@ -149,6 +152,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 // TODO: Zooming in full shows no overlay tiles. (#51)
                 mapView.addOverlay(
                     MKTileOverlay(urlTemplate: urlTemplate),
+                    // TODO: Can we use `.aboveRoads` and hide labels instead? (#54)
                     level: .aboveLabels
                 )
 
