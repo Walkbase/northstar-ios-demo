@@ -46,6 +46,7 @@ struct LoginView: View {
 
                     LabeledContent {
                         TextField("Email", text: $appData.email)
+                            // TODO: Check modifiers. (#52)
                             .autocorrectionDisabled()
                             .keyboardType(.emailAddress)
                             .textContentType(.emailAddress)
@@ -75,11 +76,13 @@ struct LoginView: View {
                                         "Password",
                                         text: $appData.password
                                     )
+                                    // TODO: Check modifiers. (#52)
                                     .autocorrectionDisabled()
                                     .keyboardType(.alphabet)
                                     .textInputAutocapitalization(.never)
                                 }
                             }
+                            // TODO: Check modifiers. (#52)
                             .textContentType(.password)
                             .submitLabel(.next)
                             .focused($focusedField, equals: .password)
@@ -110,6 +113,7 @@ struct LoginView: View {
 
                     LabeledContent {
                         TextField("API Key", text: $appData.apiKey)
+                            // TODO: Check modifiers. (#52)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                             .submitLabel(.go)
