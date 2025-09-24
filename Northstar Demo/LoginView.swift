@@ -162,6 +162,7 @@ struct LoginView: View {
             }
             .navigationTitle("Sign In")
             .toolbar {
+                // Buggy, not always showing and disappearing when moving between fields. (#35)
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Image(systemName: "chevron.down")
