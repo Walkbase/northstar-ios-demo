@@ -5,6 +5,7 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject private var appData: AppData
 
+    @State private var hideInput = true
     @State private var isLoading = false
     @State private var showAlert = false
 
@@ -62,12 +63,41 @@ struct LoginView: View {
                     }
 
                     LabeledContent {
-                        SensitiveField(
-                            label: "Password",
-                            text: $appData.password
-                        )
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .password)
+                        HStack {
+                            Group {
+                                if hideInput {
+                                    SecureField(
+                                        "Password",
+                                        text: $appData.password
+                                    )
+                                } else {
+                                    TextField(
+                                        "Password",
+                                        text: $appData.password
+                                    )
+                                    .autocorrectionDisabled()
+                                    .keyboardType(.alphabet)
+                                    .textInputAutocapitalization(.never)
+                                }
+                            }
+                            .textContentType(.password)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .password)
+
+                            if !appData.password.isEmpty {
+                                Image(
+                                    systemName: hideInput ? "eye" : "eye.slash"
+                                )
+                                .onTapGesture {
+                                    hideInput.toggle()
+                                    DispatchQueue.main.async {
+                                        focusedField = .password
+                                    }
+                                }
+                                .foregroundStyle(.black)
+                            }
+                        }
+
                     } label: {
                         Label("", systemImage: "lock")
                     }
@@ -135,45 +165,6 @@ struct LoginView: View {
                         .onTapGesture {
                             focusedField = nil
                         }
-                }
-            }
-        }
-    }
-
-    // MARK: Views
-
-    private struct SensitiveField: View {
-        let label: String
-        @Binding var text: String
-
-        @State var hideInput = true
-        @FocusState var isFocused: Bool
-
-        var body: some View {
-            HStack {
-                ZStack {
-                    if hideInput {
-                        SecureField(label, text: $text)
-                            .textContentType(.password)
-                            .focused($isFocused)
-                    } else {
-                        TextField(label, text: $text)
-                            .autocorrectionDisabled()
-                            .keyboardType(.alphabet)
-                            .textContentType(.password)
-                            .textInputAutocapitalization(.never)
-                            .focused($isFocused)
-                    }
-                }
-                if !text.isEmpty {
-                    Image(systemName: hideInput ? "eye" : "eye.slash")
-                        .onTapGesture {
-                            hideInput.toggle()
-                            DispatchQueue.main.async {
-                                isFocused = true
-                            }
-                        }
-                        .foregroundStyle(.black)
                 }
             }
         }
