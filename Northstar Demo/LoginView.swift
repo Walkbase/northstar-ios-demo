@@ -5,8 +5,7 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject private var appData: AppData
 
-    @State private var email = ""
-    @State private var password = ""
+    @State private var hideInput = true
     @State private var isLoading = false
     @State private var showAlert = false
 
@@ -46,23 +45,8 @@ struct LoginView: View {
                     }.pickerStyle(.segmented)
 
                     LabeledContent {
-                        TextField("API Key", text: $appData.apiKey)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .apiKey)
-                    } label: {
-                        Label("", systemImage: "key")
-                    }
-                    .onTapGesture {
-                        focusedField = .apiKey
-                    }
-                    .onSubmit {
-                        focusedField = .email
-                    }
-
-                    LabeledContent {
-                        TextField("Email", text: $email)
+                        TextField("Email", text: $appData.email)
+                            // TODO: Check modifiers. (#52)
                             .autocorrectionDisabled()
                             .keyboardType(.emailAddress)
                             .textContentType(.emailAddress)
@@ -80,14 +64,65 @@ struct LoginView: View {
                     }
 
                     LabeledContent {
-                        SensitiveField(label: "Password", text: $password)
-                            .submitLabel(.go)
+                        HStack {
+                            Group {
+                                if hideInput {
+                                    SecureField(
+                                        "Password",
+                                        text: $appData.password
+                                    )
+                                } else {
+                                    TextField(
+                                        "Password",
+                                        text: $appData.password
+                                    )
+                                    // TODO: Check modifiers. (#52)
+                                    .autocorrectionDisabled()
+                                    .keyboardType(.alphabet)
+                                    .textInputAutocapitalization(.never)
+                                }
+                            }
+                            // TODO: Check modifiers. (#52)
+                            .textContentType(.password)
+                            .submitLabel(.next)
                             .focused($focusedField, equals: .password)
+
+                            if !appData.password.isEmpty {
+                                Image(
+                                    systemName: hideInput ? "eye" : "eye.slash"
+                                )
+                                .onTapGesture {
+                                    hideInput.toggle()
+                                    DispatchQueue.main.async {
+                                        focusedField = .password
+                                    }
+                                }
+                                .foregroundStyle(.black)
+                            }
+                        }
+
                     } label: {
                         Label("", systemImage: "lock")
                     }
                     .onTapGesture {
                         focusedField = .password
+                    }
+                    .onSubmit {
+                        focusedField = .apiKey
+                    }
+
+                    LabeledContent {
+                        TextField("API Key", text: $appData.apiKey)
+                            // TODO: Check modifiers. (#52)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.go)
+                            .focused($focusedField, equals: .apiKey)
+                    } label: {
+                        Label("", systemImage: "key")
+                    }
+                    .onTapGesture {
+                        focusedField = .apiKey
                     }
                     .onSubmit {
                         Task { await submit() }
@@ -127,6 +162,7 @@ struct LoginView: View {
             }
             .navigationTitle("Sign In")
             .toolbar {
+                // Buggy, not always showing and disappearing when moving between fields. (#35)
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Image(systemName: "chevron.down")
@@ -134,45 +170,6 @@ struct LoginView: View {
                         .onTapGesture {
                             focusedField = nil
                         }
-                }
-            }
-        }
-    }
-
-    // MARK: Views
-
-    private struct SensitiveField: View {
-        let label: String
-        @Binding var text: String
-
-        @State var hideInput = true
-        @FocusState var isFocused: Bool
-
-        var body: some View {
-            HStack {
-                ZStack {
-                    if hideInput {
-                        SecureField(label, text: $text)
-                            .textContentType(.password)
-                            .focused($isFocused)
-                    } else {
-                        TextField(label, text: $text)
-                            .autocorrectionDisabled()
-                            .keyboardType(.alphabet)
-                            .textContentType(.password)
-                            .textInputAutocapitalization(.never)
-                            .focused($isFocused)
-                    }
-                }
-                if !text.isEmpty {
-                    Image(systemName: hideInput ? "eye" : "eye.slash")
-                        .onTapGesture {
-                            hideInput.toggle()
-                            DispatchQueue.main.async {
-                                isFocused = true
-                            }
-                        }
-                        .foregroundStyle(.black)
                 }
             }
         }
@@ -188,11 +185,14 @@ struct LoginView: View {
     }
 
     private func logIn() async {
+        // TODO: Abstract to `appData`. (#53)
         let url = URL(
             string:
                 "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"
         )!
-        let parameters: Parameters = ["username": email, "password": password]
+        let parameters: Parameters = [
+            "username": appData.email, "password": appData.password,
+        ]
         let headers: HTTPHeaders = ["W-SDK-Client-API-Key": appData.apiKey]
 
         let response = await AF.request(
