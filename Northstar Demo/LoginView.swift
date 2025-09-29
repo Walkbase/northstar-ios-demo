@@ -22,6 +22,16 @@ struct LoginView: View {
                         Text(region.name).tag(region)
                     }
                 }.pickerStyle(.segmented)
+                    .onAppear {
+                        UISegmentedControl.appearance().setTitleTextAttributes(
+                            [.foregroundColor: UIColor.black],
+                            for: .selected
+                        )
+                        UISegmentedControl.appearance().setTitleTextAttributes(
+                            [.foregroundColor: UIColor.white],
+                            for: .normal
+                        )
+                    }
 
                 LabeledContent {
                     TextField("Email", text: $appData.email)
@@ -76,7 +86,6 @@ struct LoginView: View {
                                     focusedField = .password
                                 }
                             }
-                            .foregroundStyle(.black)
                         }
                     }
 
@@ -125,6 +134,9 @@ struct LoginView: View {
                 .textCase(.uppercase)
                 .fontWeight(.bold)
             }
+            .foregroundStyle(.white)
+            .listRowBackground(Color.clear)
+            .listRowSeparatorTint(.white)
             .alert(
                 "Something Went Wrong",
                 isPresented: $showAlert
@@ -139,6 +151,8 @@ struct LoginView: View {
                 )
             }
         }
+        .background(Image("NightSky"))
+        .scrollContentBackground(.hidden)
         .scrollDismissesKeyboard(.interactively)
     }
 
