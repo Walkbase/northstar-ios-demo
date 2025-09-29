@@ -11,7 +11,19 @@ struct MapView: View {
     @State private var urlTemplate: String?
 
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            HStack {
+                Button {
+                    positioning.stop()
+                    appData.isLoggedIn = false
+                } label: {
+                    Image(systemName: "chevron.left")
+                }
+                .padding()
+
+                Spacer()
+            }
+
             TileOverlayMapView(
                 bearing: bearing,
                 location: positioning.location,
@@ -53,16 +65,6 @@ struct MapView: View {
                 if positioning.location == nil && floorID == nil {
                     ProgressView {
                         Text("Positioning...")
-                    }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        positioning.stop()
-                        appData.isLoggedIn = false
-                    } label: {
-                        Image(systemName: "chevron.left")
                     }
                 }
             }

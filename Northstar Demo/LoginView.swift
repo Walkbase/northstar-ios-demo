@@ -15,154 +15,151 @@ struct LoginView: View {
     @FocusState private var focusedField: Field?
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Authentication") {
-                    if appData.isLoggedIn {
-                        Label(
-                            "You are signed in.",
-                            systemImage: "checkmark.circle"
-                        )
-                        .padding(8)
-                        .background(Color.green.opacity(0.2))
-                        .foregroundStyle(.green)
-                        .clipShape(.rect(cornerRadius: 8))
-                    } else {
-                        Label(
-                            "You need to sign in.",
-                            systemImage: "info.circle"
-                        )
-                        .padding(8)
-                        .background(Color.blue.opacity(0.2))
-                        .foregroundStyle(.blue)
-                        .clipShape(.rect(cornerRadius: 8))
-                    }
-
-                    Picker("Region", selection: $appData.selectedRegion) {
-                        ForEach(appData.regions, id: \.name) { region in
-                            Text(region.name).tag(region)
-                        }
-                    }.pickerStyle(.segmented)
-
-                    LabeledContent {
-                        TextField("Email", text: $appData.email)
-                            // TODO: Check modifiers. (#52)
-                            .autocorrectionDisabled()
-                            .keyboardType(.emailAddress)
-                            .textContentType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .email)
-                    } label: {
-                        Label("", systemImage: "envelope")
-                    }
-                    .onTapGesture {
-                        focusedField = .email
-                    }
-                    .onSubmit {
-                        focusedField = .password
-                    }
-
-                    LabeledContent {
-                        HStack {
-                            Group {
-                                if hideInput {
-                                    SecureField(
-                                        "Password",
-                                        text: $appData.password
-                                    )
-                                } else {
-                                    TextField(
-                                        "Password",
-                                        text: $appData.password
-                                    )
-                                    // TODO: Check modifiers. (#52)
-                                    .autocorrectionDisabled()
-                                    .keyboardType(.alphabet)
-                                    .textInputAutocapitalization(.never)
-                                }
-                            }
-                            // TODO: Check modifiers. (#52)
-                            .textContentType(.password)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .password)
-
-                            if !appData.password.isEmpty {
-                                Image(
-                                    systemName: hideInput ? "eye" : "eye.slash"
-                                )
-                                .onTapGesture {
-                                    hideInput.toggle()
-                                    DispatchQueue.main.async {
-                                        focusedField = .password
-                                    }
-                                }
-                                .foregroundStyle(.black)
-                            }
-                        }
-
-                    } label: {
-                        Label("", systemImage: "lock")
-                    }
-                    .onTapGesture {
-                        focusedField = .password
-                    }
-                    .onSubmit {
-                        focusedField = .apiKey
-                    }
-
-                    LabeledContent {
-                        TextField("API Key", text: $appData.apiKey)
-                            // TODO: Check modifiers. (#52)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.go)
-                            .focused($focusedField, equals: .apiKey)
-                    } label: {
-                        Label("", systemImage: "key")
-                    }
-                    .onTapGesture {
-                        focusedField = .apiKey
-                    }
-                    .onSubmit {
-                        Task { await submit() }
-                    }
-
-                    Button {
-                        Task { await submit() }
-                    } label: {
-                        if isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Sign In")
-                        }
-                    }
-                    .disabled(isLoading)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
-                }
-                .alert(
-                    "Something Went Wrong",
-                    isPresented: $showAlert
-                ) {
-                    Button("OK", role: .cancel) {
-                    }
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                } message: {
-                    Text(
-                        "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+        Form {
+            Section {
+                if appData.isLoggedIn {
+                    Label(
+                        "You are signed in.",
+                        systemImage: "checkmark.circle"
                     )
+                    .padding(8)
+                    .background(Color.green.opacity(0.2))
+                    .foregroundStyle(.green)
+                    .clipShape(.rect(cornerRadius: 8))
+                } else {
+                    Label(
+                        "You need to sign in.",
+                        systemImage: "info.circle"
+                    )
+                    .padding(8)
+                    .background(Color.blue.opacity(0.2))
+                    .foregroundStyle(.blue)
+                    .clipShape(.rect(cornerRadius: 8))
                 }
+
+                Picker("Region", selection: $appData.selectedRegion) {
+                    ForEach(appData.regions, id: \.name) { region in
+                        Text(region.name).tag(region)
+                    }
+                }.pickerStyle(.segmented)
+
+                LabeledContent {
+                    TextField("Email", text: $appData.email)
+                        // TODO: Check modifiers. (#52)
+                        .autocorrectionDisabled()
+                        .keyboardType(.emailAddress)
+                        .textContentType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .email)
+                } label: {
+                    Label("", systemImage: "envelope")
+                }
+                .onTapGesture {
+                    focusedField = .email
+                }
+                .onSubmit {
+                    focusedField = .password
+                }
+
+                LabeledContent {
+                    HStack {
+                        Group {
+                            if hideInput {
+                                SecureField(
+                                    "Password",
+                                    text: $appData.password
+                                )
+                            } else {
+                                TextField(
+                                    "Password",
+                                    text: $appData.password
+                                )
+                                // TODO: Check modifiers. (#52)
+                                .autocorrectionDisabled()
+                                .keyboardType(.alphabet)
+                                .textInputAutocapitalization(.never)
+                            }
+                        }
+                        // TODO: Check modifiers. (#52)
+                        .textContentType(.password)
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .password)
+
+                        if !appData.password.isEmpty {
+                            Image(
+                                systemName: hideInput ? "eye" : "eye.slash"
+                            )
+                            .onTapGesture {
+                                hideInput.toggle()
+                                DispatchQueue.main.async {
+                                    focusedField = .password
+                                }
+                            }
+                            .foregroundStyle(.black)
+                        }
+                    }
+
+                } label: {
+                    Label("", systemImage: "lock")
+                }
+                .onTapGesture {
+                    focusedField = .password
+                }
+                .onSubmit {
+                    focusedField = .apiKey
+                }
+
+                LabeledContent {
+                    TextField("API Key", text: $appData.apiKey)
+                        // TODO: Check modifiers. (#52)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.go)
+                        .focused($focusedField, equals: .apiKey)
+                } label: {
+                    Label("", systemImage: "key")
+                }
+                .onTapGesture {
+                    focusedField = .apiKey
+                }
+                .onSubmit {
+                    Task { await submit() }
+                }
+
+                Button {
+                    Task { await submit() }
+                } label: {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text("Sign In")
+                    }
+                }
+                .disabled(isLoading)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.blue)
+                .foregroundStyle(.white)
+                .textCase(.uppercase)
+                .fontWeight(.bold)
             }
-            .scrollDismissesKeyboard(.interactively)
-            .navigationTitle("Sign In")
+            .alert(
+                "Something Went Wrong",
+                isPresented: $showAlert
+            ) {
+                Button("OK", role: .cancel) {
+                }
+                .background(.blue)
+                .foregroundStyle(.white)
+            } message: {
+                Text(
+                    "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+                )
+            }
         }
+        .scrollDismissesKeyboard(.interactively)
     }
 
     // MARK: Methods
