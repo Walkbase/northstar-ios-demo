@@ -24,10 +24,10 @@ class AppData: ObservableObject {
 
     @Published var selectedRegion: Region
     let regions = [
+        Region(modifier: "-dev", name: "DEV"),
         Region(modifier: "", name: "EU"),
         Region(modifier: "-uk", name: "UK"),
-        Region(modifier: "-us", name: "US"),
-        Region(modifier: "-dev", name: "DEV"),
+        Region(modifier: "-us", name: "US")
     ]
 
     // TODO: Can we auto-select this based on your location? (#50).
