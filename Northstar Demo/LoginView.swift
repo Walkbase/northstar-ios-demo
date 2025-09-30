@@ -21,19 +21,20 @@ struct LoginView: View {
                     ForEach(appData.regions, id: \.name) { region in
                         Text(region.name).tag(region)
                     }
-                }.pickerStyle(.segmented)
-                    .onAppear {
-                        UISegmentedControl.appearance().setTitleTextAttributes(
-                            [.foregroundColor: UIColor.black],
-                            for: .selected
-                        )
-                        UISegmentedControl.appearance().setTitleTextAttributes(
-                            [.foregroundColor: UIColor.white],
-                            for: .normal
-                        )
-                    }
+                }
+                .pickerStyle(.segmented)
+                .onAppear {
+                    UISegmentedControl.appearance().setTitleTextAttributes(
+                        [.foregroundColor: UIColor.black],
+                        for: .selected
+                    )
+                    UISegmentedControl.appearance().setTitleTextAttributes(
+                        [.foregroundColor: UIColor.white],
+                        for: .normal
+                    )
+                }
 
-                LabeledContent {
+                Label {
                     TextField("Email", text: $appData.email)
                         // TODO: Check modifiers. (#52)
                         .autocorrectionDisabled()
@@ -42,8 +43,8 @@ struct LoginView: View {
                         .textInputAutocapitalization(.never)
                         .submitLabel(.next)
                         .focused($focusedField, equals: .email)
-                } label: {
-                    Label("", systemImage: "envelope")
+                } icon: {
+                    Image(systemName: "envelope")
                 }
                 .onTapGesture {
                     focusedField = .email
@@ -52,7 +53,7 @@ struct LoginView: View {
                     focusedField = .password
                 }
 
-                LabeledContent {
+                Label {
                     HStack {
                         Group {
                             if hideInput {
@@ -89,8 +90,8 @@ struct LoginView: View {
                         }
                     }
 
-                } label: {
-                    Label("", systemImage: "lock")
+                } icon: {
+                    Image(systemName: "lock")
                 }
                 .onTapGesture {
                     focusedField = .password
@@ -99,15 +100,15 @@ struct LoginView: View {
                     focusedField = .apiKey
                 }
 
-                LabeledContent {
+                Label {
                     TextField("API Key", text: $appData.apiKey)
                         // TODO: Check modifiers. (#52)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                         .submitLabel(.go)
                         .focused($focusedField, equals: .apiKey)
-                } label: {
-                    Label("", systemImage: "key")
+                } icon: {
+                    Image(systemName: "key")
                 }
                 .onTapGesture {
                     focusedField = .apiKey
