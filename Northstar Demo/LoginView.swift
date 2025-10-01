@@ -15,146 +15,148 @@ struct LoginView: View {
     @FocusState private var focusedField: Field?
 
     var body: some View {
-        Form {
-            Section {
-                Picker("Region", selection: $appData.selectedRegion) {
-                    ForEach(appData.regions, id: \.name) { region in
-                        Text(region.name).tag(region)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .onAppear {
-                    UISegmentedControl.appearance().setTitleTextAttributes(
-                        [.foregroundColor: UIColor.black],
-                        for: .selected
-                    )
-                    UISegmentedControl.appearance().setTitleTextAttributes(
-                        [.foregroundColor: UIColor.white],
-                        for: .normal
-                    )
-                }
-
-                Label {
-                    TextField("Email", text: $appData.email)
-                        // TODO: Check modifiers. (#52)
-                        .autocorrectionDisabled()
-                        .keyboardType(.emailAddress)
-                        .textContentType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .email)
-                } icon: {
-                    Image(systemName: "envelope")
-                }
-                .onTapGesture {
-                    focusedField = .email
-                }
-                .onSubmit {
-                    focusedField = .password
-                }
-
-                Label {
-                    HStack {
-                        Group {
-                            if hideInput {
-                                SecureField(
-                                    "Password",
-                                    text: $appData.password
-                                )
-                            } else {
-                                TextField(
-                                    "Password",
-                                    text: $appData.password
-                                )
-                                // TODO: Check modifiers. (#52)
-                                .autocorrectionDisabled()
-                                .keyboardType(.alphabet)
-                                .textInputAutocapitalization(.never)
-                            }
+        VStack {
+            Form {
+                Section {
+                    Picker("Region", selection: $appData.selectedRegion) {
+                        ForEach(appData.regions, id: \.name) { region in
+                            Text(region.name).tag(region)
                         }
-                        // TODO: Check modifiers. (#52)
-                        .textContentType(.password)
-                        .submitLabel(.next)
-                        .focused($focusedField, equals: .password)
+                    }
+                    .pickerStyle(.segmented)
+                    .onAppear {
+                        UISegmentedControl.appearance().setTitleTextAttributes(
+                            [.foregroundColor: UIColor.black],
+                            for: .selected
+                        )
+                        UISegmentedControl.appearance().setTitleTextAttributes(
+                            [.foregroundColor: UIColor.white],
+                            for: .normal
+                        )
+                    }
 
-                        if !appData.password.isEmpty {
-                            Image(
-                                systemName: hideInput ? "eye" : "eye.slash"
-                            )
-                            .onTapGesture {
-                                hideInput.toggle()
-                                DispatchQueue.main.async {
-                                    focusedField = .password
+                    Label {
+                        TextField("Email", text: $appData.email)
+                            // TODO: Check modifiers. (#52)
+                            .autocorrectionDisabled()
+                            .keyboardType(.emailAddress)
+                            .textContentType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .email)
+                    } icon: {
+                        Image(systemName: "envelope")
+                    }
+                    .onTapGesture {
+                        focusedField = .email
+                    }
+                    .onSubmit {
+                        focusedField = .password
+                    }
+
+                    Label {
+                        HStack {
+                            Group {
+                                if hideInput {
+                                    SecureField(
+                                        "Password",
+                                        text: $appData.password
+                                    )
+                                } else {
+                                    TextField(
+                                        "Password",
+                                        text: $appData.password
+                                    )
+                                    // TODO: Check modifiers. (#52)
+                                    .autocorrectionDisabled()
+                                    .keyboardType(.alphabet)
+                                    .textInputAutocapitalization(.never)
+                                }
+                            }
+                            // TODO: Check modifiers. (#52)
+                            .textContentType(.password)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .password)
+
+                            if !appData.password.isEmpty {
+                                Image(
+                                    systemName: hideInput ? "eye" : "eye.slash"
+                                )
+                                .onTapGesture {
+                                    hideInput.toggle()
+                                    DispatchQueue.main.async {
+                                        focusedField = .password
+                                    }
                                 }
                             }
                         }
+
+                    } icon: {
+                        Image(systemName: "lock")
+                    }
+                    .onTapGesture {
+                        focusedField = .password
+                    }
+                    .onSubmit {
+                        focusedField = .apiKey
                     }
 
-                } icon: {
-                    Image(systemName: "lock")
-                }
-                .onTapGesture {
-                    focusedField = .password
-                }
-                .onSubmit {
-                    focusedField = .apiKey
-                }
-
-                Label {
-                    TextField("API Key", text: $appData.apiKey)
-                        // TODO: Check modifiers. (#52)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .submitLabel(.go)
-                        .focused($focusedField, equals: .apiKey)
-                } icon: {
-                    Image(systemName: "key")
-                }
-                .onTapGesture {
-                    focusedField = .apiKey
-                }
-                .onSubmit {
-                    Task { await submit() }
-                }
-
-                Button {
-                    Task { await submit() }
-                } label: {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Sign In")
+                    Label {
+                        TextField("API Key", text: $appData.apiKey)
+                            // TODO: Check modifiers. (#52)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.go)
+                            .focused($focusedField, equals: .apiKey)
+                    } icon: {
+                        Image(systemName: "key")
                     }
+                    .onTapGesture {
+                        focusedField = .apiKey
+                    }
+                    .onSubmit {
+                        Task { await submit() }
+                    }
+
+                    Button {
+                        Task { await submit() }
+                    } label: {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Sign In")
+                        }
+                    }
+                    .disabled(isLoading)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .textCase(.uppercase)
+                    .fontWeight(.bold)
                 }
-                .disabled(isLoading)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(.blue)
                 .foregroundStyle(.white)
-                .textCase(.uppercase)
-                .fontWeight(.bold)
-            }
-            .foregroundStyle(.white)
-            .listRowBackground(Color.clear)
-            .listRowSeparatorTint(.white)
-            .alert(
-                "Something Went Wrong",
-                isPresented: $showAlert
-            ) {
-                Button("OK", role: .cancel) {
+                .listRowBackground(Color.clear)
+                .listRowSeparatorTint(.white)
+                .alert(
+                    "Something Went Wrong",
+                    isPresented: $showAlert
+                ) {
+                    Button("OK", role: .cancel) {
+                    }
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                } message: {
+                    Text(
+                        "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+                    )
                 }
-                .background(.blue)
-                .foregroundStyle(.white)
-            } message: {
-                Text(
-                    "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
-                )
             }
+            .background(Image("NightSky"))
+            .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.interactively)
         }
-        .background(Image("NightSky"))
-        .scrollContentBackground(.hidden)
-        .scrollDismissesKeyboard(.interactively)
     }
 
     // MARK: Methods
