@@ -138,6 +138,10 @@ struct LoginView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowSeparatorTint(.white)
+                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                .alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
+                    viewDimensions.width
+                }
                 .alert(
                     "Something Went Wrong",
                     isPresented: $showAlert
