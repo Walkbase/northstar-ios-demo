@@ -173,6 +173,11 @@ struct LoginView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+
+            Image("Walkbase")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 200, alignment: .bottom)
         }
         .background(Image("NightSky"))
         .foregroundStyle(.white)
