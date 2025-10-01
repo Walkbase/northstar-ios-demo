@@ -16,6 +16,22 @@ struct LoginView: View {
 
     var body: some View {
         VStack {
+            Text("Northstar Demo")
+                .padding(.top)
+                .font(.largeTitle)
+                .fontWeight(.heavy)
+                .fontDesign(.rounded)
+
+            Image("Northstar")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 150)
+                .foregroundStyle(Gradient(colors: [.white, .cyan]))
+                .opacity(0.9)
+                .shadow(color: .white.opacity(0.5), radius: 25)
+                .blendMode(.hardLight)
+
             Form {
                 Section {
                     Picker("Region", selection: $appData.selectedRegion) {
