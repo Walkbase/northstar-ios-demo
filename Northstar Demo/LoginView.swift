@@ -136,7 +136,6 @@ struct LoginView: View {
                     .textCase(.uppercase)
                     .fontWeight(.bold)
                 }
-                .foregroundStyle(.white)
                 .listRowBackground(Color.clear)
                 .listRowSeparatorTint(.white)
                 .alert(
@@ -153,10 +152,11 @@ struct LoginView: View {
                     )
                 }
             }
-            .background(Image("NightSky"))
             .scrollContentBackground(.hidden)
-            .scrollDismissesKeyboard(.interactively)
         }
+        .background(Image("NightSky"))
+        .foregroundStyle(.white)
+        .scrollDismissesKeyboard(.interactively)
     }
 
     // MARK: Methods
