@@ -154,7 +154,6 @@ struct LoginView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(.blue)
-                .foregroundStyle(.white)
                 .textCase(.uppercase)
                 .fontWeight(.bold)
             }
@@ -165,10 +164,7 @@ struct LoginView: View {
                 "Something Went Wrong",
                 isPresented: $showAlert
             ) {
-                Button("OK", role: .cancel) {
-                }
-                .background(.blue)
-                .foregroundStyle(.white)
+                Button("OK", role: .cancel) {}
             } message: {
                 Text(
                     "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
