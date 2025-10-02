@@ -184,10 +184,11 @@ struct LoginView: View {
                         Image("Walkbase")
                             .resizable()
                             .scaledToFit()
-                            .frame(maxWidth: 200, alignment: .bottom)
+                            .frame(maxWidth: 200)
                             .transition(.opacity)
                     }
                 }
+                .frame(minHeight: geometry.size.height)
             }
             .background(Image("NightSky"))
             .foregroundStyle(.white)
