@@ -159,19 +159,21 @@ struct LoginView: View {
                         Button {
                             Task { await submit() }
                         } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Sign In")
+                            Group {
+                                if isLoading {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Text("Sign In")
+                                }
                             }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.blue)
+                            .textCase(.uppercase)
+                            .fontWeight(.bold)
                         }
                         .disabled(isLoading)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.blue)
-                        .textCase(.uppercase)
-                        .fontWeight(.bold)
                     }
                     .padding()
                     .contentShape(Rectangle())  // Expands the tappable area of the view to its full bounds.
