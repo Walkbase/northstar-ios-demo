@@ -69,14 +69,18 @@ struct LoginView: View {
                         Grid(verticalSpacing: 0) {
                             GridRow {
                                 Image(systemName: "envelope")
-                                TextField("Email", text: $appData.email)
-                                    // TODO: Check modifiers. (#52)
-                                    .autocorrectionDisabled()
-                                    .keyboardType(.emailAddress)
-                                    .textContentType(.emailAddress)
-                                    .textInputAutocapitalization(.never)
-                                    .submitLabel(.next)
-                                    .focused($focusedField, equals: .email)
+                                TextField(
+                                    "",
+                                    text: $appData.email,
+                                    prompt: Text("Email").foregroundStyle(.gray)
+                                )
+                                // TODO: Check modifiers. (#52)
+                                .autocorrectionDisabled()
+                                .keyboardType(.emailAddress)
+                                .textContentType(.emailAddress)
+                                .textInputAutocapitalization(.never)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .email)
                             }
                             .frame(minHeight: defaultMinListRowHeight)
                             .onTapGesture { focusedField = .email }
@@ -89,14 +93,18 @@ struct LoginView: View {
                                 HStack {
                                     ZStack {
                                         SecureField(
-                                            "Password",
-                                            text: $appData.password
+                                            "",
+                                            text: $appData.password,
+                                            prompt: Text("Password")
+                                                .foregroundStyle(.gray)
                                         )
                                         .opacity(hideInput ? 1 : 0)
 
                                         TextField(
-                                            "Password",
-                                            text: $appData.password
+                                            "",
+                                            text: $appData.password,
+                                            prompt: Text("Password")
+                                                .foregroundStyle(.gray)
                                         )
                                         // TODO: Check modifiers. (#52)
                                         .autocorrectionDisabled()
@@ -126,12 +134,18 @@ struct LoginView: View {
 
                             GridRow {
                                 Image(systemName: "key")
-                                TextField("API Key", text: $appData.apiKey)
-                                    // TODO: Check modifiers. (#52)
-                                    .autocorrectionDisabled()
-                                    .textInputAutocapitalization(.never)
-                                    .submitLabel(.go)
-                                    .focused($focusedField, equals: .apiKey)
+                                TextField(
+                                    "",
+                                    text: $appData.apiKey,
+                                    prompt: Text("API Key").foregroundStyle(
+                                        .gray
+                                    )
+                                )
+                                // TODO: Check modifiers. (#52)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                                .submitLabel(.go)
+                                .focused($focusedField, equals: .apiKey)
                             }
                             .frame(minHeight: defaultMinListRowHeight)
                             .onTapGesture { focusedField = .apiKey }
