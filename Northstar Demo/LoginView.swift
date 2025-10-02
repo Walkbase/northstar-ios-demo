@@ -188,14 +188,14 @@ struct LoginView: View {
                             .transition(.opacity)
                     }
                 }
-                .background(Image("NightSky"))
-                .foregroundStyle(.white)
-                .onChange(of: focusedField) { _, latestFocusedField in
-                    isKeyboardHidden = latestFocusedField == nil
-                }
-                .onTapGesture { focusedField = nil }
-                .animation(.easeInOut, value: isKeyboardHidden)
             }
+            .background(Image("NightSky"))
+            .foregroundStyle(.white)
+            .onChange(of: focusedField) { _, latestFocusedField in
+                isKeyboardHidden = latestFocusedField == nil
+            }
+            .onTapGesture { focusedField = nil }
+            .animation(.easeInOut, value: isKeyboardHidden)
         }
     }
 
