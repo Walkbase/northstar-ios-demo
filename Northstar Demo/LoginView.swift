@@ -13,24 +13,33 @@ struct LoginView: View {
         case apiKey, email, password
     }
     @FocusState private var focusedField: Field?
+    /// Due to some SwiftUI limitation/bug, you can't animate UI directly off `@FocusState` changes.
+    /// Fade-out (when focus is set) will animate, but fade-in (when focus clears) does not.
+    /// You can mirror focus into a separate `@State` and control the animation from that as a workaround.
+    @State private var isKeyboardHidden = true
 
     var body: some View {
         VStack {
-            Text("Northstar Demo")
-                .padding(.top)
-                .font(.largeTitle)
-                .fontWeight(.heavy)
-                .fontDesign(.rounded)
+            if isKeyboardHidden {
+                Group {
+                    Text("Northstar Demo")
+                        .padding(.top)
+                        .font(.largeTitle)
+                        .fontWeight(.heavy)
+                        .fontDesign(.rounded)
 
-            Image("Northstar")
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 150)
-                .foregroundStyle(Gradient(colors: [.white, .cyan]))
-                .opacity(0.9)
-                .shadow(color: .white.opacity(0.5), radius: 25)
-                .blendMode(.hardLight)
+                    Image("Northstar")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: 150)
+                        .foregroundStyle(Gradient(colors: [.white, .cyan]))
+                        .opacity(0.9)
+                        .shadow(color: .white.opacity(0.5), radius: 25)
+                        .blendMode(.hardLight)
+                }
+                .transition(.opacity)
+            }
 
             Form {
                 Section {
@@ -174,14 +183,27 @@ struct LoginView: View {
             }
             .scrollContentBackground(.hidden)
 
-            Image("Walkbase")
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 200, alignment: .bottom)
+            if isKeyboardHidden {
+                Image("Walkbase")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 200, alignment: .bottom)
+                    .transition(.opacity)
+            }
         }
         .background(Image("NightSky"))
         .foregroundStyle(.white)
         .scrollDismissesKeyboard(.interactively)
+        .onChange(of: focusedField) { _, latestFocusedField in
+            isKeyboardHidden = latestFocusedField == nil
+        }
+        // This triggers as soon as the keyboard starts hiding.
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: UIResponder.keyboardWillHideNotification
+            )
+        ) { _ in isKeyboardHidden = true }
+        .animation(.easeInOut, value: isKeyboardHidden)
     }
 
     // MARK: Methods
