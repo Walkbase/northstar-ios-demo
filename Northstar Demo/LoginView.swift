@@ -3,6 +3,7 @@ import Northstar
 import SwiftUI
 
 struct LoginView: View {
+    @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
     @EnvironmentObject private var appData: AppData
 
     @State private var hideInput = true
@@ -41,26 +42,27 @@ struct LoginView: View {
                 .transition(.opacity)
             }
 
-            Form {
-                Section {
-                    Picker("Region", selection: $appData.selectedRegion) {
-                        ForEach(appData.regions, id: \.name) { region in
-                            Text(region.name).tag(region)
-                        }
+            VStack {
+                Picker("Region", selection: $appData.selectedRegion) {
+                    ForEach(appData.regions, id: \.name) { region in
+                        Text(region.name).tag(region)
                     }
-                    .pickerStyle(.segmented)
-                    .onAppear {
-                        UISegmentedControl.appearance().setTitleTextAttributes(
-                            [.foregroundColor: UIColor.black],
-                            for: .selected
-                        )
-                        UISegmentedControl.appearance().setTitleTextAttributes(
-                            [.foregroundColor: UIColor.white],
-                            for: .normal
-                        )
-                    }
+                }
+                .pickerStyle(.segmented)
+                .onAppear {
+                    UISegmentedControl.appearance().setTitleTextAttributes(
+                        [.foregroundColor: UIColor.black],
+                        for: .selected
+                    )
+                    UISegmentedControl.appearance().setTitleTextAttributes(
+                        [.foregroundColor: UIColor.white],
+                        for: .normal
+                    )
+                }
 
-                    Label {
+                Grid(verticalSpacing: 0) {
+                    GridRow {
+                        Image(systemName: "envelope")
                         TextField("Email", text: $appData.email)
                             // TODO: Check modifiers. (#52)
                             .autocorrectionDisabled()
@@ -69,17 +71,15 @@ struct LoginView: View {
                             .textInputAutocapitalization(.never)
                             .submitLabel(.next)
                             .focused($focusedField, equals: .email)
-                    } icon: {
-                        Image(systemName: "envelope")
                     }
-                    .onTapGesture {
-                        focusedField = .email
-                    }
-                    .onSubmit {
-                        focusedField = .password
-                    }
+                    .frame(minHeight: defaultMinListRowHeight)
+                    .onTapGesture { focusedField = .email }
+                    .onSubmit { focusedField = .password }
 
-                    Label {
+                    Divider().background(.white)
+
+                    GridRow {
+                        Image(systemName: "lock")
                         HStack {
                             Group {
                                 if hideInput {
@@ -115,75 +115,69 @@ struct LoginView: View {
                                 }
                             }
                         }
+                    }
+                    .frame(minHeight: defaultMinListRowHeight)
+                    .onTapGesture { focusedField = .password }
+                    .onSubmit { focusedField = .apiKey }
 
-                    } icon: {
-                        Image(systemName: "lock")
-                    }
-                    .onTapGesture {
-                        focusedField = .password
-                    }
-                    .onSubmit {
-                        focusedField = .apiKey
-                    }
+                    Divider().background(.white)
 
-                    Label {
+                    GridRow {
+                        Image(systemName: "key")
                         TextField("API Key", text: $appData.apiKey)
                             // TODO: Check modifiers. (#52)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                             .submitLabel(.go)
                             .focused($focusedField, equals: .apiKey)
-                    } icon: {
-                        Image(systemName: "key")
                     }
-                    .onTapGesture {
-                        focusedField = .apiKey
-                    }
-                    .onSubmit {
-                        Task { await submit() }
-                    }
+                    .frame(minHeight: defaultMinListRowHeight)
+                    .onTapGesture { focusedField = .apiKey }
+                    .onSubmit { Task { await submit() } }
 
-                    Button {
-                        Task { await submit() }
-                    } label: {
-                        if isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Sign In")
-                        }
+                    Divider().background(.white)
+                }
+
+                Divider().background(.clear)
+
+                Button {
+                    Task { await submit() }
+                } label: {
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text("Sign In")
                     }
-                    .disabled(isLoading)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
                 }
-                .listRowBackground(Color.clear)
-                .listRowSeparatorTint(.white)
-                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                .alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
-                    viewDimensions.width
-                }
-                .alert(
-                    "Something Went Wrong",
-                    isPresented: $showAlert
-                ) {
-                    Button("OK", role: .cancel) {
-                    }
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                } message: {
-                    Text(
-                        "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
-                    )
-                }
+                .disabled(isLoading)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.blue)
+                .foregroundStyle(.white)
+                .textCase(.uppercase)
+                .fontWeight(.bold)
             }
-            .scrollContentBackground(.hidden)
+            .padding()
+            .contentShape(Rectangle())  // Expands the tappable area of the view to its full bounds.
+            .onTapGesture {}  // Empty handler to swallow taps and prevent them from propagating to the parent.
+            .alert(
+                "Something Went Wrong",
+                isPresented: $showAlert
+            ) {
+                Button("OK", role: .cancel) {
+                }
+                .background(.blue)
+                .foregroundStyle(.white)
+            } message: {
+                Text(
+                    "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+                )
+            }
 
             if isKeyboardHidden {
+                Spacer()
+
                 Image("Walkbase")
                     .resizable()
                     .scaledToFit()
@@ -193,16 +187,10 @@ struct LoginView: View {
         }
         .background(Image("NightSky"))
         .foregroundStyle(.white)
-        .scrollDismissesKeyboard(.interactively)
         .onChange(of: focusedField) { _, latestFocusedField in
             isKeyboardHidden = latestFocusedField == nil
         }
-        // This triggers as soon as the keyboard starts hiding.
-        .onReceive(
-            NotificationCenter.default.publisher(
-                for: UIResponder.keyboardWillHideNotification
-            )
-        ) { _ in isKeyboardHidden = true }
+        .onTapGesture { focusedField = nil }
         .animation(.easeInOut, value: isKeyboardHidden)
     }
 
