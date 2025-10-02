@@ -191,6 +191,7 @@ struct LoginView: View {
                 isKeyboardHidden = latestFocusedField == nil
             }
             .onTapGesture { focusedField = nil }
+            .scrollDismissesKeyboard(.interactively)
             .animation(.easeInOut, value: isKeyboardHidden)
         }
     }
