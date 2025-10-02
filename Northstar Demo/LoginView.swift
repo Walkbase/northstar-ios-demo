@@ -20,174 +20,183 @@ struct LoginView: View {
     @State private var isKeyboardHidden = true
 
     var body: some View {
-        VStack {
-            if isKeyboardHidden {
-                Group {
-                    Text("Northstar Demo")
-                        .padding(.top)
-                        .font(.largeTitle)
-                        .fontWeight(.heavy)
-                        .fontDesign(.rounded)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack {
+                    if isKeyboardHidden {
+                        Group {
+                            Text("Northstar Demo")
+                                .padding(.top)
+                                .font(.largeTitle)
+                                .fontWeight(.heavy)
+                                .fontDesign(.rounded)
 
-                    Image("Northstar")
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: 150)
-                        .foregroundStyle(Gradient(colors: [.white, .cyan]))
-                        .opacity(0.9)
-                        .shadow(color: .white.opacity(0.5), radius: 25)
-                        .blendMode(.hardLight)
-                }
-                .transition(.opacity)
-            }
-
-            VStack {
-                Picker("Region", selection: $appData.selectedRegion) {
-                    ForEach(appData.regions, id: \.name) { region in
-                        Text(region.name).tag(region)
+                            Image("Northstar")
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: 150)
+                                .foregroundStyle(
+                                    Gradient(colors: [.white, .cyan])
+                                )
+                                .opacity(0.9)
+                                .shadow(color: .white.opacity(0.5), radius: 25)
+                                .blendMode(.hardLight)
+                        }
+                        .transition(.opacity)
                     }
-                }
-                .pickerStyle(.segmented)
-                .onAppear {
-                    UISegmentedControl.appearance().setTitleTextAttributes(
-                        [.foregroundColor: UIColor.black],
-                        for: .selected
-                    )
-                    UISegmentedControl.appearance().setTitleTextAttributes(
-                        [.foregroundColor: UIColor.white],
-                        for: .normal
-                    )
-                }
 
-                Grid(verticalSpacing: 0) {
-                    GridRow {
-                        Image(systemName: "envelope")
-                        TextField("Email", text: $appData.email)
-                            // TODO: Check modifiers. (#52)
-                            .autocorrectionDisabled()
-                            .keyboardType(.emailAddress)
-                            .textContentType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .email)
-                    }
-                    .frame(minHeight: defaultMinListRowHeight)
-                    .onTapGesture { focusedField = .email }
-                    .onSubmit { focusedField = .password }
+                    VStack {
+                        Picker("Region", selection: $appData.selectedRegion) {
+                            ForEach(appData.regions, id: \.name) { region in
+                                Text(region.name).tag(region)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .onAppear {
+                            UISegmentedControl.appearance()
+                                .setTitleTextAttributes(
+                                    [.foregroundColor: UIColor.black],
+                                    for: .selected
+                                )
+                            UISegmentedControl.appearance()
+                                .setTitleTextAttributes(
+                                    [.foregroundColor: UIColor.white],
+                                    for: .normal
+                                )
+                        }
 
-                    Divider().background(.white)
-
-                    GridRow {
-                        Image(systemName: "lock")
-                        HStack {
-                            Group {
-                                if hideInput {
-                                    SecureField(
-                                        "Password",
-                                        text: $appData.password
-                                    )
-                                } else {
-                                    TextField(
-                                        "Password",
-                                        text: $appData.password
-                                    )
+                        Grid(verticalSpacing: 0) {
+                            GridRow {
+                                Image(systemName: "envelope")
+                                TextField("Email", text: $appData.email)
                                     // TODO: Check modifiers. (#52)
                                     .autocorrectionDisabled()
-                                    .keyboardType(.alphabet)
+                                    .keyboardType(.emailAddress)
+                                    .textContentType(.emailAddress)
                                     .textInputAutocapitalization(.never)
-                                }
+                                    .submitLabel(.next)
+                                    .focused($focusedField, equals: .email)
                             }
-                            // TODO: Check modifiers. (#52)
-                            .textContentType(.password)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .password)
+                            .frame(minHeight: defaultMinListRowHeight)
+                            .onTapGesture { focusedField = .email }
+                            .onSubmit { focusedField = .password }
 
-                            if !appData.password.isEmpty {
-                                Image(
-                                    systemName: hideInput ? "eye" : "eye.slash"
-                                )
-                                .onTapGesture {
-                                    hideInput.toggle()
-                                    DispatchQueue.main.async {
-                                        focusedField = .password
+                            Divider().background(.white)
+
+                            GridRow {
+                                Image(systemName: "lock")
+                                HStack {
+                                    Group {
+                                        if hideInput {
+                                            SecureField(
+                                                "Password",
+                                                text: $appData.password
+                                            )
+                                        } else {
+                                            TextField(
+                                                "Password",
+                                                text: $appData.password
+                                            )
+                                            // TODO: Check modifiers. (#52)
+                                            .autocorrectionDisabled()
+                                            .keyboardType(.alphabet)
+                                            .textInputAutocapitalization(.never)
+                                        }
+                                    }
+                                    // TODO: Check modifiers. (#52)
+                                    .textContentType(.password)
+                                    .submitLabel(.next)
+                                    .focused($focusedField, equals: .password)
+
+                                    if !appData.password.isEmpty {
+                                        Image(
+                                            systemName: hideInput
+                                                ? "eye" : "eye.slash"
+                                        )
+                                        .onTapGesture {
+                                            hideInput.toggle()
+                                            DispatchQueue.main.async {
+                                                focusedField = .password
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            .frame(minHeight: defaultMinListRowHeight)
+                            .onTapGesture { focusedField = .password }
+                            .onSubmit { focusedField = .apiKey }
+
+                            Divider().background(.white)
+
+                            GridRow {
+                                Image(systemName: "key")
+                                TextField("API Key", text: $appData.apiKey)
+                                    // TODO: Check modifiers. (#52)
+                                    .autocorrectionDisabled()
+                                    .textInputAutocapitalization(.never)
+                                    .submitLabel(.go)
+                                    .focused($focusedField, equals: .apiKey)
+                            }
+                            .frame(minHeight: defaultMinListRowHeight)
+                            .onTapGesture { focusedField = .apiKey }
+                            .onSubmit { Task { await submit() } }
+
+                            Divider().background(.white)
                         }
+
+                        Divider().background(.clear)
+
+                        Button {
+                            Task { await submit() }
+                        } label: {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Sign In")
+                            }
+                        }
+                        .disabled(isLoading)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.blue)
+                        .textCase(.uppercase)
+                        .fontWeight(.bold)
                     }
-                    .frame(minHeight: defaultMinListRowHeight)
-                    .onTapGesture { focusedField = .password }
-                    .onSubmit { focusedField = .apiKey }
-
-                    Divider().background(.white)
-
-                    GridRow {
-                        Image(systemName: "key")
-                        TextField("API Key", text: $appData.apiKey)
-                            // TODO: Check modifiers. (#52)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.go)
-                            .focused($focusedField, equals: .apiKey)
+                    .padding()
+                    .contentShape(Rectangle())  // Expands the tappable area of the view to its full bounds.
+                    .onTapGesture {}  // Empty handler to swallow taps and prevent them from propagating to the parent.
+                    .alert(
+                        "Something Went Wrong",
+                        isPresented: $showAlert
+                    ) {
+                        Button("OK", role: .cancel) {}
+                    } message: {
+                        Text(
+                            "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
+                        )
                     }
-                    .frame(minHeight: defaultMinListRowHeight)
-                    .onTapGesture { focusedField = .apiKey }
-                    .onSubmit { Task { await submit() } }
 
-                    Divider().background(.white)
+                    if isKeyboardHidden {
+                        Spacer()
+
+                        Image("Walkbase")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 200, alignment: .bottom)
+                            .transition(.opacity)
+                    }
                 }
-
-                Divider().background(.clear)
-
-                Button {
-                    Task { await submit() }
-                } label: {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Sign In")
-                    }
+                .background(Image("NightSky"))
+                .foregroundStyle(.white)
+                .onChange(of: focusedField) { _, latestFocusedField in
+                    isKeyboardHidden = latestFocusedField == nil
                 }
-                .disabled(isLoading)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(.blue)
-                .textCase(.uppercase)
-                .fontWeight(.bold)
-            }
-            .padding()
-            .contentShape(Rectangle())  // Expands the tappable area of the view to its full bounds.
-            .onTapGesture {}  // Empty handler to swallow taps and prevent them from propagating to the parent.
-            .alert(
-                "Something Went Wrong",
-                isPresented: $showAlert
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(
-                    "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
-                )
-            }
-
-            if isKeyboardHidden {
-                Spacer()
-
-                Image("Walkbase")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: 200, alignment: .bottom)
-                    .transition(.opacity)
+                .onTapGesture { focusedField = nil }
+                .animation(.easeInOut, value: isKeyboardHidden)
             }
         }
-        .background(Image("NightSky"))
-        .foregroundStyle(.white)
-        .onChange(of: focusedField) { _, latestFocusedField in
-            isKeyboardHidden = latestFocusedField == nil
-        }
-        .onTapGesture { focusedField = nil }
-        .animation(.easeInOut, value: isKeyboardHidden)
     }
 
     // MARK: Methods
