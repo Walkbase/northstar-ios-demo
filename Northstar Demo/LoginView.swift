@@ -87,22 +87,22 @@ struct LoginView: View {
                             GridRow {
                                 Image(systemName: "lock")
                                 HStack {
-                                    Group {
-                                        if hideInput {
-                                            SecureField(
-                                                "Password",
-                                                text: $appData.password
-                                            )
-                                        } else {
-                                            TextField(
-                                                "Password",
-                                                text: $appData.password
-                                            )
-                                            // TODO: Check modifiers. (#52)
-                                            .autocorrectionDisabled()
-                                            .keyboardType(.alphabet)
-                                            .textInputAutocapitalization(.never)
-                                        }
+                                    ZStack {
+                                        SecureField(
+                                            "Password",
+                                            text: $appData.password
+                                        )
+                                        .opacity(hideInput ? 1 : 0)
+
+                                        TextField(
+                                            "Password",
+                                            text: $appData.password
+                                        )
+                                        // TODO: Check modifiers. (#52)
+                                        .autocorrectionDisabled()
+                                        .keyboardType(.alphabet)
+                                        .textInputAutocapitalization(.never)
+                                        .opacity(hideInput ? 0 : 1)
                                     }
                                     // TODO: Check modifiers. (#52)
                                     .textContentType(.password)
@@ -114,12 +114,7 @@ struct LoginView: View {
                                             systemName: hideInput
                                                 ? "eye" : "eye.slash"
                                         )
-                                        .onTapGesture {
-                                            hideInput.toggle()
-                                            DispatchQueue.main.async {
-                                                focusedField = .password
-                                            }
-                                        }
+                                        .onTapGesture { hideInput.toggle() }
                                     }
                                 }
                             }
