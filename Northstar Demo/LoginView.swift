@@ -8,13 +8,14 @@ struct LoginView: View {
 
     @State private var hideInput = true
     @State private var isLoading = false
+    @State private var rotate = false
     @State private var showAlert = false
 
     enum Field {
         case apiKey, email, password
     }
     @FocusState private var focusedField: Field?
-    /// Due to some SwiftUI limitation/bug, you can't animate UI directly off `@FocusState` changes.
+    /// Due to some SwiftUI limitation/bug, you can't animate directly off `@FocusState` changes.
     /// Fade-out (when focus is set) will animate, but fade-in (when focus clears) does not.
     /// You can mirror focus into a separate `@State` and control the animation from that as a workaround.
     @State private var isKeyboardHidden = true
@@ -69,14 +70,18 @@ struct LoginView: View {
                         Grid(verticalSpacing: 0) {
                             GridRow {
                                 Image(systemName: "envelope")
-                                TextField("Email", text: $appData.email)
-                                    // TODO: Check modifiers. (#52)
-                                    .autocorrectionDisabled()
-                                    .keyboardType(.emailAddress)
-                                    .textContentType(.emailAddress)
-                                    .textInputAutocapitalization(.never)
-                                    .submitLabel(.next)
-                                    .focused($focusedField, equals: .email)
+                                TextField(
+                                    "",
+                                    text: $appData.email,
+                                    prompt: Text("Email").foregroundStyle(.gray)
+                                )
+                                // TODO: Check modifiers. (#52)
+                                .autocorrectionDisabled()
+                                .keyboardType(.emailAddress)
+                                .textContentType(.emailAddress)
+                                .textInputAutocapitalization(.never)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .email)
                             }
                             .frame(minHeight: defaultMinListRowHeight)
                             .onTapGesture { focusedField = .email }
@@ -89,14 +94,18 @@ struct LoginView: View {
                                 HStack {
                                     ZStack {
                                         SecureField(
-                                            "Password",
-                                            text: $appData.password
+                                            "",
+                                            text: $appData.password,
+                                            prompt: Text("Password")
+                                                .foregroundStyle(.gray)
                                         )
                                         .opacity(hideInput ? 1 : 0)
 
                                         TextField(
-                                            "Password",
-                                            text: $appData.password
+                                            "",
+                                            text: $appData.password,
+                                            prompt: Text("Password")
+                                                .foregroundStyle(.gray)
                                         )
                                         // TODO: Check modifiers. (#52)
                                         .autocorrectionDisabled()
@@ -126,12 +135,18 @@ struct LoginView: View {
 
                             GridRow {
                                 Image(systemName: "key")
-                                TextField("API Key", text: $appData.apiKey)
-                                    // TODO: Check modifiers. (#52)
-                                    .autocorrectionDisabled()
-                                    .textInputAutocapitalization(.never)
-                                    .submitLabel(.go)
-                                    .focused($focusedField, equals: .apiKey)
+                                TextField(
+                                    "",
+                                    text: $appData.apiKey,
+                                    prompt: Text("API Key").foregroundStyle(
+                                        .gray
+                                    )
+                                )
+                                // TODO: Check modifiers. (#52)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                                .submitLabel(.go)
+                                .focused($focusedField, equals: .apiKey)
                             }
                             .frame(minHeight: defaultMinListRowHeight)
                             .onTapGesture { focusedField = .apiKey }
@@ -145,19 +160,21 @@ struct LoginView: View {
                         Button {
                             Task { await submit() }
                         } label: {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Sign In")
+                            Group {
+                                if isLoading {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Text("Sign In")
+                                }
                             }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.blue)
+                            .textCase(.uppercase)
+                            .fontWeight(.bold)
                         }
                         .disabled(isLoading)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.blue)
-                        .textCase(.uppercase)
-                        .fontWeight(.bold)
                     }
                     .padding()
                     .contentShape(Rectangle())  // Expands the tappable area of the view to its full bounds.
@@ -185,7 +202,17 @@ struct LoginView: View {
                 }
                 .frame(minHeight: geometry.size.height)
             }
-            .background(Image("NightSky"))
+            .background {
+                Image("NightSky")
+                    .rotationEffect(.degrees(rotate ? 360 : 0))
+                    .animation(
+                        .linear(duration: 200).repeatForever(
+                            autoreverses: false
+                        ),
+                        value: rotate
+                    )
+                    .onAppear { rotate = true }
+            }
             .foregroundStyle(.white)
             .onChange(of: focusedField) { _, latestFocusedField in
                 isKeyboardHidden = latestFocusedField == nil

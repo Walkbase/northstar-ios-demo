@@ -57,9 +57,22 @@
 		E1E6A5152E003BA6008C737D /* Northstar DemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E132788D2E8FF3EE00600510 /* Exceptions for "Northstar Demo" folder in "Northstar Demo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Northstar-Demo-Info.plist",
+			);
+			target = E1E6A4FD2E003BA5008C737D /* Northstar Demo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E1E6A5002E003BA5008C737D /* Northstar Demo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E132788D2E8FF3EE00600510 /* Exceptions for "Northstar Demo" folder in "Northstar Demo" target */,
+			);
 			path = "Northstar Demo";
 			sourceTree = "<group>";
 		};
@@ -471,6 +484,7 @@
 				DEVELOPMENT_TEAM = CR78ZDZ2ND;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Northstar-Demo-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used for iBeacon advertisement.";
 				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "Used for iBeacon advertisement.";
@@ -479,7 +493,6 @@
 				INFOPLIST_KEY_NSMotionUsageDescription = "Used to improve positioning accuracy.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 18;
@@ -510,6 +523,7 @@
 				DEVELOPMENT_TEAM = CR78ZDZ2ND;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Northstar-Demo-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used for iBeacon advertisement.";
 				INFOPLIST_KEY_NSBluetoothWhileInUseUsageDescription = "Used for iBeacon advertisement.";
@@ -518,7 +532,6 @@
 				INFOPLIST_KEY_NSMotionUsageDescription = "Used to improve positioning accuracy.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 18;
