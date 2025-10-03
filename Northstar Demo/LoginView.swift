@@ -8,6 +8,7 @@ struct LoginView: View {
 
     @State private var hideInput = true
     @State private var isLoading = false
+    @State private var rotate = false
     @State private var showAlert = false
 
     enum Field {
@@ -201,7 +202,17 @@ struct LoginView: View {
                 }
                 .frame(minHeight: geometry.size.height)
             }
-            .background(Image("NightSky"))
+            .background {
+                Image("NightSky")
+                    .rotationEffect(.degrees(rotate ? 360 : 0))
+                    .animation(
+                        .linear(duration: 200).repeatForever(
+                            autoreverses: false
+                        ),
+                        value: rotate
+                    )
+                    .onAppear { rotate = true }
+            }
             .foregroundStyle(.white)
             .onChange(of: focusedField) { _, latestFocusedField in
                 isKeyboardHidden = latestFocusedField == nil
