@@ -21,6 +21,7 @@ class AppData: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var isLoggedIn = false
+    @Published var shouldCheckLoginStatus = true
 
     @Published var selectedRegion: Region
     let regions = [

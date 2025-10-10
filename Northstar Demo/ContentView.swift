@@ -1,19 +1,17 @@
+import Alamofire
 import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var appData: AppData
 
     var body: some View {
-        ZStack {
-            if appData.isLoggedIn {
-                MapView()
-                    .transition(.move(edge: .trailing))
-            } else {
-                LoginView()
-                    .transition(.move(edge: .leading))
-            }
+        if appData.isLoggedIn {
+            MapView()
+                .transition(.opacity)
+        } else {
+            LoginView()
+                .transition(.opacity)
         }
-        .animation(.easeInOut, value: appData.isLoggedIn)
     }
 }
 
