@@ -50,7 +50,8 @@ struct LoginView: View {
                     VStack {
                         Picker("Region", selection: $appData.selectedRegion) {
                             ForEach(appData.regions, id: \.name) { region in
-                                Text(region.name).tag(region)
+                                Text(region.name.rawValue.uppercased())
+                                    .tag(region)
                             }
                         }
                         .pickerStyle(.segmented)

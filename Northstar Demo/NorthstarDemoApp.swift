@@ -24,10 +24,10 @@ class AppData: ObservableObject {
 
     @Published var selectedRegion: Region
     let regions = [
-        Region(modifier: "-dev", name: "DEV"),
-        Region(modifier: "", name: "EU"),
-        Region(modifier: "-uk", name: "UK"),
-        Region(modifier: "-us", name: "US")
+        Region(modifier: "-dev", name: .dev),
+        Region(modifier: "", name: .eu),
+        Region(modifier: "-uk", name: .uk),
+        Region(modifier: "-us", name: .us),
     ]
 
     // TODO: Can we auto-select this based on your location? (#50).
@@ -37,6 +37,6 @@ class AppData: ObservableObject {
 
     struct Region: Hashable {
         let modifier: String
-        let name: String
+        let name: Northstar.Region
     }
 }

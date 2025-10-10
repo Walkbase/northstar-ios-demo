@@ -32,11 +32,15 @@ struct MapView: View {
             .task {
                 // TODO: Handle throws when implemented. (#40)
                 await positioning.registerDevice(
-                    apiKey: appData.apiKey,
+                    using: appData.apiKey,
+                    in: appData.selectedRegion.name,
                     // TODO: What casing should we use? (#20, SDK)
-                    userID: "northstar-demo"
+                    for: "northstar-demo"
                 )
-                await positioning.start(using: appData.apiKey)
+                await positioning.start(
+                    using: appData.apiKey,
+                    in: appData.selectedRegion.name
+                )
             }
             .onReceive(positioning.$location) { location in
                 guard let latestFloorID = location?.floor_id else {
