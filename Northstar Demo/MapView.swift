@@ -15,7 +15,9 @@ struct MapView: View {
             HStack {
                 Button {
                     positioning.stop()
-                    appData.isLoggedIn = false
+                    withAnimation(.easeInOut) {
+                        appData.isLoggedIn = false
+                    }
                 } label: {
                     Image(systemName: "chevron.left")
                 }
