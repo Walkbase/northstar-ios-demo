@@ -8,73 +8,86 @@ struct MapView: View {
     @EnvironmentObject private var positioning: Positioning
     @State private var bearing: Double?
     @State private var floorID: Int?
+    @State private var maxZoom: Int?
+    @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
+        TileOverlayMapView(
+            bearing: bearing,
+            location: positioning.location,
+            maxZoom: maxZoom,
+            minZoom: minZoom,
+            urlTemplate: urlTemplate
+        )
+        .ignoresSafeArea()
+        .task {
+            // TODO: Handle throws when implemented. (#40)
+            await positioning.registerDevice(
+                using: appData.apiKey,
+                in: appData.selectedRegion.name,
+                // TODO: What casing should we use? (#20, SDK)
+                for: "northstar-demo"
+            )
+            await positioning.start(
+                using: appData.apiKey,
+                in: appData.selectedRegion.name
+            )
+        }
+        .onReceive(positioning.$location) { location in
+            guard let latestFloorID = location?.floor_id else {
+                // TODO: Should we start a timer to clear the map? (#40)
+                return
+            }
+
+            if floorID != latestFloorID {
+                Task {
+                    let floor = await fetchFloor(
+                        using: latestFloorID
+                    )
+                    // TODO: Remove when `fetchFloor` throws. (#41).
+                    if let floor {
+                        bearing = floor.bearing
+                        maxZoom = floor.tiles.max_zoom
+                        minZoom = floor.tiles.min_zoom
+                        // TODO: Abstract to `appData`. (#53)
+                        urlTemplate =
+                            "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
+                        floorID = latestFloorID
+                    }
+                }
+            }
+        }
+        // TODO: Improve if we loose our location. (#40)
+        .overlay {
+            if positioning.location == nil && floorID == nil {
+                ProgressView {
+                    Text("Positioning...")
+                }
+            }
+        }
+        .overlay(
+            Menu {
                 Button {
                     positioning.stop()
                     withAnimation(.easeInOut) {
                         appData.isLoggedIn = false
                     }
+
                 } label: {
-                    Image(systemName: "chevron.left")
+                    Label(
+                        "Sign Out",
+                        systemImage: "iphone.and.arrow.forward.outward"
+                    )
                 }
-                .padding()
-
-                Spacer()
-            }
-
-            TileOverlayMapView(
-                bearing: bearing,
-                location: positioning.location,
-                urlTemplate: urlTemplate
-            )
-            .task {
-                // TODO: Handle throws when implemented. (#40)
-                await positioning.registerDevice(
-                    using: appData.apiKey,
-                    in: appData.selectedRegion.name,
-                    // TODO: What casing should we use? (#20, SDK)
-                    for: "northstar-demo"
-                )
-                await positioning.start(
-                    using: appData.apiKey,
-                    in: appData.selectedRegion.name
-                )
-            }
-            .onReceive(positioning.$location) { location in
-                guard let latestFloorID = location?.floor_id else {
-                    // TODO: Should we start a timer to clear the map? (#40)
-                    return
-                }
-
-                if floorID != latestFloorID {
-                    Task {
-                        let floor = await fetchFloor(
-                            using: latestFloorID
-                        )
-                        // TODO: Remove when `fetchFloor` throws. (#41).
-                        if let floor {
-                            bearing = floor.bearing
-                            // TODO: Abstract to `appData`. (#53)
-                            urlTemplate =
-                                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
-                            floorID = latestFloorID
-                        }
-                    }
-                }
-            }
-            // TODO: Improve if we loose our location. (#40)
-            .overlay {
-                if positioning.location == nil && floorID == nil {
-                    ProgressView {
-                        Text("Positioning...")
-                    }
-                }
-            }
-        }
+            } label: {
+                Image(systemName: "line.3.horizontal.circle.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(.gray, .background)
+                    .padding()
+            },
+            alignment: .topLeading
+        )
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
@@ -133,11 +146,19 @@ struct MapView: View {
 private struct TileOverlayMapView: UIViewRepresentable {
     var bearing: Double?
     var location: Location?
+    var maxZoom: Int?
+    var minZoom: Int?
     var urlTemplate: String?
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
+
+        // Remove labels.
+        let config = MKStandardMapConfiguration()
+        config.pointOfInterestFilter = .excludingAll
+        mapView.preferredConfiguration = config
+
         return mapView
     }
 
@@ -156,11 +177,12 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 mapView.addAnnotation(annotation)
                 context.coordinator.currentAnnotation = annotation
 
-                // TODO: Zooming in full shows no overlay tiles. (#51)
+                let overlay = MKTileOverlay(urlTemplate: urlTemplate)
+                minZoom.map { overlay.minimumZ = $0 }
+                maxZoom.map { overlay.maximumZ = $0 }
                 mapView.addOverlay(
-                    MKTileOverlay(urlTemplate: urlTemplate),
-                    // TODO: Can we use `.aboveRoads` and hide labels instead? (#54)
-                    level: .aboveLabels
+                    overlay,
+                    level: .aboveRoads
                 )
 
                 mapView.setCamera(
