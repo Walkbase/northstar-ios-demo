@@ -244,7 +244,7 @@ struct LoginView: View {
             let start = Date()
 
             let response = await AF.request(
-                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api",
+                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/",
                 method: .head
             ).validate().serializingData().response
 
@@ -283,17 +283,13 @@ struct LoginView: View {
 
     private func logIn() async {
         // TODO: Abstract to `appData`. (#53)
-        let url = URL(
-            string:
-                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login"
-        )!
         let parameters: Parameters = [
             "username": appData.email, "password": appData.password,
         ]
         let headers: HTTPHeaders = ["W-SDK-Client-API-Key": appData.apiKey]
 
         let response = await AF.request(
-            url,
+            "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login",
             method: .post,
             parameters: parameters,
             headers: headers,
