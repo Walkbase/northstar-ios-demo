@@ -244,7 +244,7 @@ struct LoginView: View {
             let start = Date()
 
             let response = await AF.request(
-                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api",
+                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/",
                 method: .head
             ).validate().serializingData().response
 
