@@ -11,67 +11,65 @@ struct MapView: View {
     @State private var urlTemplate: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button {
-                    positioning.stop()
-                    withAnimation(.easeInOut) {
-                        appData.isLoggedIn = false
-                    }
-                } label: {
-                    Image(systemName: "chevron.left")
+        HStack {
+            Button {
+                positioning.stop()
+                withAnimation(.easeInOut) {
+                    appData.isLoggedIn = false
                 }
-                .padding()
-
-                Spacer()
+            } label: {
+                Image(systemName: "chevron.left")
             }
+            .padding()
 
-            TileOverlayMapView(
-                bearing: bearing,
-                location: positioning.location,
-                urlTemplate: urlTemplate
+            Spacer()
+        }
+
+        TileOverlayMapView(
+            bearing: bearing,
+            location: positioning.location,
+            urlTemplate: urlTemplate
+        )
+        .task {
+            // TODO: Handle throws when implemented. (#40)
+            await positioning.registerDevice(
+                using: appData.apiKey,
+                in: appData.selectedRegion.name,
+                // TODO: What casing should we use? (#20, SDK)
+                for: "northstar-demo"
             )
-            .task {
-                // TODO: Handle throws when implemented. (#40)
-                await positioning.registerDevice(
-                    using: appData.apiKey,
-                    in: appData.selectedRegion.name,
-                    // TODO: What casing should we use? (#20, SDK)
-                    for: "northstar-demo"
-                )
-                await positioning.start(
-                    using: appData.apiKey,
-                    in: appData.selectedRegion.name
-                )
+            await positioning.start(
+                using: appData.apiKey,
+                in: appData.selectedRegion.name
+            )
+        }
+        .onReceive(positioning.$location) { location in
+            guard let latestFloorID = location?.floor_id else {
+                // TODO: Should we start a timer to clear the map? (#40)
+                return
             }
-            .onReceive(positioning.$location) { location in
-                guard let latestFloorID = location?.floor_id else {
-                    // TODO: Should we start a timer to clear the map? (#40)
-                    return
-                }
 
-                if floorID != latestFloorID {
-                    Task {
-                        let floor = await fetchFloor(
-                            using: latestFloorID
-                        )
-                        // TODO: Remove when `fetchFloor` throws. (#41).
-                        if let floor {
-                            bearing = floor.bearing
-                            // TODO: Abstract to `appData`. (#53)
-                            urlTemplate =
-                                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
-                            floorID = latestFloorID
-                        }
+            if floorID != latestFloorID {
+                Task {
+                    let floor = await fetchFloor(
+                        using: latestFloorID
+                    )
+                    // TODO: Remove when `fetchFloor` throws. (#41).
+                    if let floor {
+                        bearing = floor.bearing
+                        // TODO: Abstract to `appData`. (#53)
+                        urlTemplate =
+                            "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
+                        floorID = latestFloorID
                     }
                 }
             }
-            // TODO: Improve if we loose our location. (#40)
-            .overlay {
-                if positioning.location == nil && floorID == nil {
-                    ProgressView {
-                        Text("Positioning...")
-                    }
+        }
+        // TODO: Improve if we loose our location. (#40)
+        .overlay {
+            if positioning.location == nil && floorID == nil {
+                ProgressView {
+                    Text("Positioning...")
                 }
             }
         }
