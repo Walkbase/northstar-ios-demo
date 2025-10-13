@@ -11,20 +11,6 @@ struct MapView: View {
     @State private var urlTemplate: String?
 
     var body: some View {
-        HStack {
-            Button {
-                positioning.stop()
-                withAnimation(.easeInOut) {
-                    appData.isLoggedIn = false
-                }
-            } label: {
-                Image(systemName: "chevron.left")
-            }
-            .padding()
-
-            Spacer()
-        }
-
         TileOverlayMapView(
             bearing: bearing,
             location: positioning.location,
@@ -73,6 +59,28 @@ struct MapView: View {
                 }
             }
         }
+        .overlay(
+            Menu {
+                Button {
+                    positioning.stop()
+                    withAnimation(.easeInOut) {
+                        appData.isLoggedIn = false
+                    }
+
+                } label: {
+                    Label(
+                        "Sign Out",
+                        systemImage: "iphone.and.arrow.forward.outward"
+                    )
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal.circle.fill")
+                    .font(.title)
+                    .foregroundStyle(.gray, .background)
+                    .padding()
+            },
+            alignment: .topLeading
+        )
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
