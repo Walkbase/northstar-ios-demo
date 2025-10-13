@@ -16,6 +16,7 @@ struct MapView: View {
             location: positioning.location,
             urlTemplate: urlTemplate
         )
+        .ignoresSafeArea()
         .task {
             // TODO: Handle throws when implemented. (#40)
             await positioning.registerDevice(
@@ -75,7 +76,7 @@ struct MapView: View {
                 }
             } label: {
                 Image(systemName: "line.3.horizontal.circle.fill")
-                    .font(.title)
+                    .font(.largeTitle)
                     .foregroundStyle(.gray, .background)
                     .padding()
             },
