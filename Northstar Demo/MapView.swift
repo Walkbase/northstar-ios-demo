@@ -8,12 +8,16 @@ struct MapView: View {
     @EnvironmentObject private var positioning: Positioning
     @State private var bearing: Double?
     @State private var floorID: Int?
+    @State private var maxZoom: Int?
+    @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
     var body: some View {
         TileOverlayMapView(
             bearing: bearing,
             location: positioning.location,
+            maxZoom: maxZoom,
+            minZoom: minZoom,
             urlTemplate: urlTemplate
         )
         .ignoresSafeArea()
@@ -44,6 +48,8 @@ struct MapView: View {
                     // TODO: Remove when `fetchFloor` throws. (#41).
                     if let floor {
                         bearing = floor.bearing
+                        maxZoom = floor.tiles.max_zoom
+                        minZoom = floor.tiles.min_zoom
                         // TODO: Abstract to `appData`. (#53)
                         urlTemplate =
                             "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
@@ -140,6 +146,8 @@ struct MapView: View {
 private struct TileOverlayMapView: UIViewRepresentable {
     var bearing: Double?
     var location: Location?
+    var maxZoom: Int?
+    var minZoom: Int?
     var urlTemplate: String?
 
     func makeUIView(context: Context) -> MKMapView {
@@ -169,9 +177,11 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 mapView.addAnnotation(annotation)
                 context.coordinator.currentAnnotation = annotation
 
-                // TODO: Zooming in full shows no overlay tiles. (#51)
+                let overlay = MKTileOverlay(urlTemplate: urlTemplate)
+                minZoom.map { overlay.minimumZ = $0 }
+                maxZoom.map { overlay.maximumZ = $0 }
                 mapView.addOverlay(
-                    MKTileOverlay(urlTemplate: urlTemplate),
+                    overlay,
                     level: .aboveRoads
                 )
 
