@@ -145,6 +145,12 @@ private struct TileOverlayMapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
+
+        // Remove labels.
+        let config = MKStandardMapConfiguration()
+        config.pointOfInterestFilter = .excludingAll
+        mapView.preferredConfiguration = config
+
         return mapView
     }
 
@@ -166,8 +172,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 // TODO: Zooming in full shows no overlay tiles. (#51)
                 mapView.addOverlay(
                     MKTileOverlay(urlTemplate: urlTemplate),
-                    // TODO: Can we use `.aboveRoads` and hide labels instead? (#54)
-                    level: .aboveLabels
+                    level: .aboveRoads
                 )
 
                 mapView.setCamera(
