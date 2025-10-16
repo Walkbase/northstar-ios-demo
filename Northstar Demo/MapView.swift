@@ -1,7 +1,10 @@
 import Alamofire
 import MapKit
 import Northstar
+import Sentry
 import SwiftUI
+
+private let logger = SentrySDK.logger
 
 struct MapView: View {
     @EnvironmentObject private var appData: AppData
@@ -108,22 +111,23 @@ struct MapView: View {
                     from: data
                 )
             } catch {
-                print("Decoding error: \(error)")
+                logger.error("Decoding error: \(error)")
+                SentrySDK.capture(error: error)
                 return nil
             }
 
         case .failure(let error):
-            print("Error: \(error)")
-
             if let statusCode = response.response?.statusCode {
-                print("HTTP status code: \(statusCode)")
+                logger.error("HTTP status code: \(statusCode)")
             }
 
             if let data = response.data,
                 let serverMessage = String(data: data, encoding: .utf8)
             {
-                print("Server message: \(serverMessage)")
+                logger.error("Server message: \(serverMessage)")
             }
+
+            SentrySDK.capture(error: error)
 
             return nil
         }
