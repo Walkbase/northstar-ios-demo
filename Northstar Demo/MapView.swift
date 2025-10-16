@@ -28,13 +28,13 @@ struct MapView: View {
             // TODO: Handle throws when implemented. (#40)
             await positioning.registerDevice(
                 using: appData.apiKey,
-                in: appData.selectedRegion.name,
+                in: appData.selectedRegion,
                 // TODO: What casing should we use? (#20, SDK)
                 for: "northstar-demo"
             )
             await positioning.start(
                 using: appData.apiKey,
-                in: appData.selectedRegion.name
+                in: appData.selectedRegion
             )
         }
         .onReceive(positioning.$location) { location in
@@ -55,7 +55,7 @@ struct MapView: View {
                         minZoom = floor.tiles.min_zoom
                         // TODO: Abstract to `appData`. (#53)
                         urlTemplate =
-                            "https://analytics\(appData.selectedRegion.modifier).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
+                            "https://analytics-\(appData.selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
                         floorID = latestFloorID
                     }
                 }
@@ -97,7 +97,7 @@ struct MapView: View {
     private func fetchFloor(using floorID: Int) async -> FloorResponse? {
         // TODO: Abstract to `appData`. (#53)
         let response = await AF.request(
-            "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/floors/v2/\(floorID)"
+            "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/floors/v2/\(floorID)"
         )
         .validate()
         .serializingData()

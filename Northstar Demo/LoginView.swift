@@ -56,8 +56,8 @@ struct LoginView: View {
                         VStack {
                             Picker("Region", selection: $appData.selectedRegion)
                             {
-                                ForEach(appData.regions, id: \.name) { region in
-                                    Text(region.name.rawValue.uppercased())
+                                ForEach(appData.regions, id: \.self) { region in
+                                    Text(region.rawValue.uppercased())
                                         .tag(region)
                                 }
                             }
@@ -244,7 +244,7 @@ struct LoginView: View {
             let start = Date()
 
             let response = await AF.request(
-                "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/",
+                "https://analytics-\(appData.selectedRegion).walkbase.com/api/",
                 method: .head
             ).validate().serializingData().response
 
@@ -289,7 +289,7 @@ struct LoginView: View {
         let headers: HTTPHeaders = ["W-SDK-Client-API-Key": appData.apiKey]
 
         let response = await AF.request(
-            "https://analytics\(appData.selectedRegion.modifier).walkbase.com/api/j/login",
+            "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/login",
             method: .post,
             parameters: parameters,
             headers: headers,
