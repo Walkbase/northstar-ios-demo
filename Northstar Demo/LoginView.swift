@@ -282,17 +282,14 @@ struct LoginView: View {
     }
 
     private func logIn() async {
-        // TODO: Abstract to `appData`. (#53)
         let parameters: Parameters = [
             "username": appData.email, "password": appData.password,
         ]
-        let headers: HTTPHeaders = ["W-SDK-Client-API-Key": appData.apiKey]
-
         let response = await AF.request(
+            // TODO: Abstract to `appData`. (#53)
             "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/login",
             method: .post,
             parameters: parameters,
-            headers: headers,
         ).validate().serializingData().response
 
         if case .success = response.result {
