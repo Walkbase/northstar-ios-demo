@@ -27,18 +27,14 @@ struct NorthstarDemoApp: App {
 }
 
 class AppData: ObservableObject {
-    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
-
     @Published var apiKey = ""
     @Published var email = ""
     @Published var password = ""
+
+    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
     @Published var isLoggedIn = false
 
-    @Published var selectedRegion: Northstar.Region
-    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
-
     // TODO: Can we auto-select this based on your location? (#50).
-    init() {
-        selectedRegion = regions[0]
-    }
+    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
+    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
 }
