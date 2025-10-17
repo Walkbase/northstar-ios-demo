@@ -27,8 +27,8 @@ struct NorthstarDemoApp: App {
 }
 
 class AppData: ObservableObject {
-    @Published var apiKey = ""
-    @Published var email = ""
+    @AppStorage("apiKey") var apiKey = ""
+    @AppStorage("email") var email = ""
     @Published var password = ""
 
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
