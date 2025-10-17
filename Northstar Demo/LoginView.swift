@@ -261,12 +261,12 @@ struct LoginView: View {
                 withAnimation(.easeInOut) {
                     appData.isLoggedIn = true
                 } completion: {
-                    appData.shouldCheckLoginStatus = false
+                    appData.shouldCheckLoginStatus = true
                 }
             } else {
                 withAnimation(.easeInOut) {
-                    appData.isLoggedIn = false
                     appData.shouldCheckLoginStatus = false
+                    appData.isLoggedIn = false
                 }
             }
         }
@@ -298,9 +298,11 @@ struct LoginView: View {
         if case .success = response.result {
             withAnimation(.easeInOut) {
                 appData.isLoggedIn = true
+                appData.shouldCheckLoginStatus = true
             }
         } else {
             appData.isLoggedIn = false
+            appData.shouldCheckLoginStatus = false
             showAlert = true
         }
     }
