@@ -5,10 +5,13 @@ import SwiftUI
 struct LoginView: View {
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
     @EnvironmentObject private var appData: AppData
+    @EnvironmentObject private var positioning: Positioning
 
     @State private var hideInput = true
     @State private var isLoading = false
     @State private var rotate = false
+
+    @State private var alertMessage = ""
     @State private var showAlert = false
 
     enum Field {
@@ -198,9 +201,7 @@ struct LoginView: View {
                         ) {
                             Button("OK", role: .cancel) {}
                         } message: {
-                            Text(
-                                "We could not sign you in. Please check your internet connection, chosen region, and login credentials, and try again."
-                            )
+                            Text(alertMessage)
                         }
                     }
 
@@ -248,26 +249,41 @@ struct LoginView: View {
                 method: .head
             ).validate().serializingData().response
 
-            // Ensure the sign-in check takes long enough to prevent flicker.
-            let elapsed = Date().timeIntervalSince(start)
-            let minimumShowDuration = 2.0  // seconds
-            if elapsed < minimumShowDuration {
-                try? await Task.sleep(
-                    for: .seconds(minimumShowDuration - elapsed)
-                )
+            if case .failure = response.result {
+                appData.shouldCheckLoginStatus = false
+                alertMessage =
+                    "Your session has expired. Please sign in to continue."
+                showAlert = true
+                return
             }
 
-            if case .success = response.result {
+            do {
+                try await positioning.registerDevice(
+                    using: appData.apiKey,
+                    in: appData.selectedRegion,
+                    // TODO: What casing should we use? (#20, SDK)
+                    for: "northstar-demo"
+                )
+
+                // Ensure the sign-in check takes long enough to prevent flicker.
+                let elapsed = Date().timeIntervalSince(start)
+                let minimumShowDuration = 2.0  // seconds
+                if elapsed < minimumShowDuration {
+                    try? await Task.sleep(
+                        for: .seconds(minimumShowDuration - elapsed)
+                    )
+                }
+
                 withAnimation(.easeInOut) {
                     appData.isLoggedIn = true
                 } completion: {
                     appData.shouldCheckLoginStatus = true
                 }
-            } else {
-                withAnimation(.easeInOut) {
-                    appData.shouldCheckLoginStatus = false
-                    appData.isLoggedIn = false
-                }
+            } catch {
+                appData.shouldCheckLoginStatus = false
+                alertMessage =
+                    "We could sign you in, but could not validate your API key. Please check your API key and try again."
+                showAlert = true
             }
         }
     }
@@ -292,14 +308,28 @@ struct LoginView: View {
             parameters: parameters,
         ).validate().serializingData().response
 
-        if case .success = response.result {
+        if case .failure = response.result {
+            alertMessage =
+                "We could not sign you in. Please check your internet connection, chosen region, and login credentials, then try again."
+            showAlert = true
+            return
+        }
+
+        do {
+            try await positioning.registerDevice(
+                using: appData.apiKey,
+                in: appData.selectedRegion,
+                // TODO: What casing should we use? (#20, SDK)
+                for: "northstar-demo"
+            )
             withAnimation(.easeInOut) {
                 appData.isLoggedIn = true
+            } completion: {
                 appData.shouldCheckLoginStatus = true
             }
-        } else {
-            appData.isLoggedIn = false
-            appData.shouldCheckLoginStatus = false
+        } catch {
+            alertMessage =
+                "We could sign you in, but could not validate your API key. Please check your API key and try again."
             showAlert = true
         }
     }

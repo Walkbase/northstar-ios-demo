@@ -25,13 +25,6 @@ struct MapView: View {
         )
         .ignoresSafeArea()
         .task {
-            // TODO: Handle throws when implemented. (#40)
-            await positioning.registerDevice(
-                using: appData.apiKey,
-                in: appData.selectedRegion,
-                // TODO: What casing should we use? (#20, SDK)
-                for: "northstar-demo"
-            )
             await positioning.start(
                 using: appData.apiKey,
                 in: appData.selectedRegion
