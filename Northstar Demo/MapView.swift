@@ -72,11 +72,42 @@ struct MapView: View {
         .overlay(
             Menu {
                 Button {
-                    positioning.stop()
-                    withAnimation(.easeInOut) {
-                        appData.isLoggedIn = false
-                    }
+                    Task {
+                        positioning.stop()
 
+                        let response = await AF.request(
+                            "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/logout",
+                            method: .post
+                        )
+                        .validate()
+                        // TODO: Remove when backend is fixed. (#82)
+                        .serializingData(emptyResponseCodes: [200])
+                        .response
+
+                        switch response.result {
+                        case .success:
+                            appData.shouldCheckLoginStatus = false
+                            withAnimation(.easeInOut) {
+                                appData.isLoggedIn = false
+                            }
+                        case .failure(let error):
+                            if let statusCode = response.response?.statusCode {
+                                logger.error("HTTP status code: \(statusCode)")
+                            }
+
+                            if let data = response.data,
+                                let serverMessage = String(
+                                    data: data,
+                                    encoding: .utf8
+                                )
+                            {
+                                logger.error("Server message: \(serverMessage)")
+                            }
+
+                            print("Error: \(error)")
+                            SentrySDK.capture(error: error)
+                        }
+                    }
                 } label: {
                     Label(
                         "Sign Out",

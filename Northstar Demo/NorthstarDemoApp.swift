@@ -27,11 +27,12 @@ struct NorthstarDemoApp: App {
 }
 
 class AppData: ObservableObject {
+    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
+
     @Published var apiKey = ""
     @Published var email = ""
     @Published var password = ""
     @Published var isLoggedIn = false
-    @Published var shouldCheckLoginStatus = true
 
     @Published var selectedRegion: Northstar.Region
     let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
