@@ -102,7 +102,7 @@ struct MapView: View {
                                 logger.error("Server message: \(serverMessage)")
                             }
 
-                            print("Error: \(error)")
+                            logger.error("Error: \(error)")
                             SentrySDK.capture(error: error)
                         }
                     }

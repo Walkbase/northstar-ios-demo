@@ -263,7 +263,7 @@ struct LoginView: View {
             if case .failure = response.result {
                 shouldCheckLoginStatus = false
                 alertMessage =
-                    "Your session has expired. Please sign in to continue."
+                    "Your session has expired or there was a network issue.\n\nPlease check your internet connection, then try signing in to continue."
                 showAlert = true
                 return
             }
@@ -293,7 +293,7 @@ struct LoginView: View {
             } catch {
                 shouldCheckLoginStatus = false
                 alertMessage =
-                    "We could sign you in, but could not validate your API key. Please check your API key and try again."
+                    "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
                 showAlert = true
             }
         }
@@ -321,7 +321,7 @@ struct LoginView: View {
 
         if case .failure = response.result {
             alertMessage =
-                "We could not sign you in. Please check your internet connection, chosen region, and login credentials, then try again."
+                "We could not sign you in.\n\nPlease check your internet connection, chosen region, and login credentials, then try again."
             showAlert = true
             return
         }
@@ -340,7 +340,7 @@ struct LoginView: View {
             }
         } catch {
             alertMessage =
-                "We could sign you in, but could not validate your API key. Please check your API key and try again."
+                "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
             showAlert = true
         }
     }
