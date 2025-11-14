@@ -350,6 +350,7 @@ struct LoginView: View {
 
 #Preview {
     @Previewable var appData = AppData()
+    @Previewable var positioning = Positioning()
 
-    LoginView().environment(appData)
+    LoginView().environment(appData).environment(positioning)
 }

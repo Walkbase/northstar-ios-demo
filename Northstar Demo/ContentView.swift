@@ -1,4 +1,5 @@
 import Alamofire
+import Northstar
 import SwiftUI
 
 struct ContentView: View {
@@ -17,6 +18,7 @@ struct ContentView: View {
 
 #Preview {
     @Previewable var appData = AppData()
+    @Previewable var positioning = Positioning()
 
-    ContentView().environment(appData)
+    ContentView().environment(appData).environment(positioning)
 }
