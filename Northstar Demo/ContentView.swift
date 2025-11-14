@@ -2,7 +2,7 @@ import Alamofire
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var appData: AppData
+    @Environment(AppData.self) private var appData: AppData
 
     var body: some View {
         if appData.isLoggedIn {
@@ -16,8 +16,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    @Previewable @StateObject var appData = AppData()
+    @Previewable var appData = AppData()
 
-    ContentView()
-        .environmentObject(appData)
+    ContentView().environment(appData)
 }
