@@ -4,8 +4,18 @@ import SwiftUI
 
 struct LoginView: View {
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
-    @EnvironmentObject private var appData: AppData
-    @EnvironmentObject private var positioning: Positioning
+    @Environment(AppData.self) private var appData: AppData
+    @Environment(Positioning.self) private var positioning: Positioning
+
+    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
+
+    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
+    // TODO: Can we auto-select this based on your location? (#50).
+    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
+
+    @AppStorage("apiKey") var apiKey = ""
+    @AppStorage("email") var email = ""
+    @State private var password = ""
 
     @State private var hideInput = true
     @State private var isLoading = false
@@ -24,6 +34,8 @@ struct LoginView: View {
     @State private var isKeyboardHidden = true
 
     var body: some View {
+        @Bindable var appData = appData
+
         GeometryReader { geometry in
             ScrollView {
                 VStack {
@@ -50,16 +62,15 @@ struct LoginView: View {
                         .transition(.opacity)
                     }
 
-                    if appData.shouldCheckLoginStatus {
+                    if shouldCheckLoginStatus {
                         Spacer()
                         ProgressView().tint(.white)
                         Text("Checking your sign-in status…")
                         Spacer()
                     } else {
                         VStack {
-                            Picker("Region", selection: $appData.selectedRegion)
-                            {
-                                ForEach(appData.regions, id: \.self) { region in
+                            Picker("Region", selection: $selectedRegion) {
+                                ForEach(regions, id: \.self) { region in
                                     Text(region.rawValue.uppercased())
                                         .tag(region)
                                 }
@@ -83,7 +94,7 @@ struct LoginView: View {
                                     Image(systemName: "envelope")
                                     TextField(
                                         "",
-                                        text: $appData.email,
+                                        text: $email,
                                         prompt: Text("Email").foregroundStyle(
                                             .gray
                                         )
@@ -108,7 +119,7 @@ struct LoginView: View {
                                         ZStack {
                                             SecureField(
                                                 "",
-                                                text: $appData.password,
+                                                text: $password,
                                                 prompt: Text("Password")
                                                     .foregroundStyle(.gray)
                                             )
@@ -116,7 +127,7 @@ struct LoginView: View {
 
                                             TextField(
                                                 "",
-                                                text: $appData.password,
+                                                text: $password,
                                                 prompt: Text("Password")
                                                     .foregroundStyle(.gray)
                                             )
@@ -134,7 +145,7 @@ struct LoginView: View {
                                             equals: .password
                                         )
 
-                                        if !appData.password.isEmpty {
+                                        if !password.isEmpty {
                                             Image(
                                                 systemName: hideInput
                                                     ? "eye" : "eye.slash"
@@ -153,7 +164,7 @@ struct LoginView: View {
                                     Image(systemName: "key")
                                     TextField(
                                         "",
-                                        text: $appData.apiKey,
+                                        text: $apiKey,
                                         prompt: Text("API Key").foregroundStyle(
                                             .gray
                                         )
@@ -240,27 +251,27 @@ struct LoginView: View {
             .animation(.easeInOut, value: isKeyboardHidden)
         }
         .task {
-            guard appData.shouldCheckLoginStatus else { return }
+            guard shouldCheckLoginStatus else { return }
 
             let start = Date()
 
             let response = await AF.request(
-                "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/user",
+                "https://analytics-\(selectedRegion).walkbase.com/api/j/user",
                 method: .head
             ).validate().serializingData().response
 
             if case .failure = response.result {
-                appData.shouldCheckLoginStatus = false
+                shouldCheckLoginStatus = false
                 alertMessage =
-                    "Your session has expired. Please sign in to continue."
+                    "Your session has expired or there was a network issue.\n\nPlease check your internet connection, then try signing in to continue."
                 showAlert = true
                 return
             }
 
             do {
                 try await positioning.registerDevice(
-                    using: appData.apiKey,
-                    in: appData.selectedRegion,
+                    using: apiKey,
+                    in: selectedRegion,
                     // TODO: What casing should we use? (#20, SDK)
                     for: "northstar-demo"
                 )
@@ -277,12 +288,12 @@ struct LoginView: View {
                 withAnimation(.easeInOut) {
                     appData.isLoggedIn = true
                 } completion: {
-                    appData.shouldCheckLoginStatus = true
+                    shouldCheckLoginStatus = true
                 }
             } catch {
-                appData.shouldCheckLoginStatus = false
+                shouldCheckLoginStatus = false
                 alertMessage =
-                    "We could sign you in, but could not validate your API key. Please check your API key and try again."
+                    "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
                 showAlert = true
             }
         }
@@ -299,37 +310,37 @@ struct LoginView: View {
 
     private func logIn() async {
         let parameters: Parameters = [
-            "username": appData.email, "password": appData.password,
+            "username": email, "password": password,
         ]
         let response = await AF.request(
             // TODO: Abstract to `appData`. (#53)
-            "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/login",
+            "https://analytics-\(selectedRegion).walkbase.com/api/j/login",
             method: .post,
             parameters: parameters,
         ).validate().serializingData().response
 
         if case .failure = response.result {
             alertMessage =
-                "We could not sign you in. Please check your internet connection, chosen region, and login credentials, then try again."
+                "We could not sign you in.\n\nPlease check your internet connection, chosen region, and login credentials, then try again."
             showAlert = true
             return
         }
 
         do {
             try await positioning.registerDevice(
-                using: appData.apiKey,
-                in: appData.selectedRegion,
+                using: apiKey,
+                in: selectedRegion,
                 // TODO: What casing should we use? (#20, SDK)
                 for: "northstar-demo"
             )
             withAnimation(.easeInOut) {
                 appData.isLoggedIn = true
             } completion: {
-                appData.shouldCheckLoginStatus = true
+                shouldCheckLoginStatus = true
             }
         } catch {
             alertMessage =
-                "We could sign you in, but could not validate your API key. Please check your API key and try again."
+                "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
             showAlert = true
         }
     }
@@ -338,8 +349,8 @@ struct LoginView: View {
 // MARK: Preview
 
 #Preview {
-    @Previewable @StateObject var appData = AppData()
+    @Previewable var appData = AppData()
+    @Previewable var positioning = Positioning()
 
-    LoginView()
-        .environmentObject(appData)
+    LoginView().environment(appData).environment(positioning)
 }

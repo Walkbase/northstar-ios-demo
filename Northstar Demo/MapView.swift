@@ -7,8 +7,13 @@ import SwiftUI
 private let logger = SentrySDK.logger
 
 struct MapView: View {
-    @EnvironmentObject private var appData: AppData
-    @EnvironmentObject private var positioning: Positioning
+    @Environment(AppData.self) var appData: AppData
+    @Environment(Positioning.self) var positioning: Positioning
+
+    @AppStorage("apiKey") var apiKey = ""
+    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
+    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
+
     @State private var bearing: Double?
     @State private var floorID: Int?
     @State private var maxZoom: Int?
@@ -26,11 +31,11 @@ struct MapView: View {
         .ignoresSafeArea()
         .task {
             await positioning.start(
-                using: appData.apiKey,
-                in: appData.selectedRegion
+                using: apiKey,
+                in: selectedRegion
             )
         }
-        .onReceive(positioning.$location) { location in
+        .onChange(of: positioning.location) { oldLocation, location in
             guard let latestFloorID = location?.floor_id else {
                 // TODO: Should we start a timer to clear the map? (#40)
                 return
@@ -48,7 +53,7 @@ struct MapView: View {
                         minZoom = floor.tiles.min_zoom
                         // TODO: Abstract to `appData`. (#53)
                         urlTemplate =
-                            "https://analytics-\(appData.selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
+                            "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
                         floorID = latestFloorID
                     }
                 }
@@ -69,7 +74,7 @@ struct MapView: View {
                         positioning.stop()
 
                         let response = await AF.request(
-                            "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/logout",
+                            "https://analytics-\(selectedRegion).walkbase.com/api/j/logout",
                             method: .post
                         )
                         .validate()
@@ -79,7 +84,7 @@ struct MapView: View {
 
                         switch response.result {
                         case .success:
-                            appData.shouldCheckLoginStatus = false
+                            shouldCheckLoginStatus = false
                             withAnimation(.easeInOut) {
                                 appData.isLoggedIn = false
                             }
@@ -97,7 +102,7 @@ struct MapView: View {
                                 logger.error("Server message: \(serverMessage)")
                             }
 
-                            print("Error: \(error)")
+                            logger.error("Error: \(error)")
                             SentrySDK.capture(error: error)
                         }
                     }
@@ -121,7 +126,7 @@ struct MapView: View {
     private func fetchFloor(using floorID: Int) async -> FloorResponse? {
         // TODO: Abstract to `appData`. (#53)
         let response = await AF.request(
-            "https://analytics-\(appData.selectedRegion).walkbase.com/api/j/floors/v2/\(floorID)"
+            "https://analytics-\(selectedRegion).walkbase.com/api/j/floors/v2/\(floorID)"
         )
         .validate()
         .serializingData()
@@ -260,10 +265,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
 }
 
 #Preview {
-    @Previewable @StateObject var appData = AppData()
-    @Previewable @StateObject var positioning = Positioning()
+    @Previewable var appData = AppData()
+    @Previewable var positioning = Positioning()
 
-    MapView()
-        .environmentObject(appData)
-        .environmentObject(positioning)
+    MapView().environment(appData).environment(positioning)
 }

@@ -5,8 +5,8 @@ import SwiftUI
 
 @main
 struct NorthstarDemoApp: App {
-    @StateObject private var appData = AppData()
-    @StateObject private var positioning = Positioning()
+    private var appData = AppData()
+    private var positioning = Positioning()
 
     init() {
         SentrySDK.start { options in
@@ -20,21 +20,13 @@ struct NorthstarDemoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appData)
-                .environmentObject(positioning)
+                .environment(appData)
+                .environment(positioning)
         }
     }
 }
 
-class AppData: ObservableObject {
-    @AppStorage("apiKey") var apiKey = ""
-    @AppStorage("email") var email = ""
-    @Published var password = ""
-
-    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
-    @Published var isLoggedIn = false
-
-    // TODO: Can we auto-select this based on your location? (#50).
-    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
-    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
+@Observable
+class AppData {
+    var isLoggedIn = false
 }
