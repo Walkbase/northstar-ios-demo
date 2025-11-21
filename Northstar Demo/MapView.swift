@@ -21,6 +21,7 @@ struct MapView: View {
     @State private var urlTemplate: String?
 
     @Namespace private var animation
+    @State private var diagnosticsCount = 0
     @State private var showPositioningDiagnostics = false
 
     var body: some View {
@@ -182,9 +183,16 @@ struct MapView: View {
     }
 
     private func syncPositioningDiagnosticsVisibility() {
-        showPositioningDiagnostics =
-            positioning.bluetoothError != nil
-            || positioning.motionDataWarning != nil
+        let newDiagnosticsCount = [
+            positioning.bluetoothError != nil,
+            positioning.motionDataWarning != nil,
+        ].filter { $0 }.count
+
+        if newDiagnosticsCount > diagnosticsCount {
+            showPositioningDiagnostics = true
+        }
+
+        diagnosticsCount = newDiagnosticsCount
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
