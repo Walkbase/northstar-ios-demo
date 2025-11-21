@@ -137,24 +137,22 @@ struct MapView: View {
                     let content = Group {
                         if let bluetoothError = positioning.bluetoothError {
                             PositioningDiagnostic(
-                                color: .red,
                                 expanded: showPositioningDiagnostics,
-                                icon: "exclamationmark.octagon.fill",
                                 id: "bluetoothError",
                                 message: bluetoothError.message,
-                                namespace: animation
+                                namespace: animation,
+                                severity: .error
                             )
                         }
 
                         if let motionDataWarning = positioning.motionDataWarning
                         {
                             PositioningDiagnostic(
-                                color: .orange,
                                 expanded: showPositioningDiagnostics,
-                                icon: "exclamationmark.triangle.fill",
                                 id: "motionDataWarning",
                                 message: motionDataWarning.message,
-                                namespace: animation
+                                namespace: animation,
+                                severity: .warning
                             )
                         }
                     }
@@ -332,24 +330,29 @@ private struct TileOverlayMapView: UIViewRepresentable {
 }
 
 private struct PositioningDiagnostic: View {
-    let color: Color
     let expanded: Bool
-    let icon: String
     let id: String
     let message: String
     let namespace: Namespace.ID
+    let severity: Severity
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            Image(systemName: icon)
-                .matchedGeometryEffect(id: id, in: namespace)
+            Image(
+                systemName: severity == .error
+                    ? "exclamationmark.octagon.fill"
+                    : "exclamationmark.triangle.fill"
+            )
+            .matchedGeometryEffect(id: id, in: namespace)
 
             if expanded {
                 Text(message)
             }
         }
-        .foregroundStyle(color)
+        .foregroundStyle(severity == .error ? .red : .orange)
     }
+
+    enum Severity { case error, warning }
 }
 extension BluetoothError {
     var message: String {
