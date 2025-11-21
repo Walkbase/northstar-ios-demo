@@ -20,7 +20,6 @@ struct MapView: View {
     @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
-    @State private var bluetoothError: BluetoothError?
     @State private var showBluetoothError = false
 
     var body: some View {
@@ -62,11 +61,9 @@ struct MapView: View {
                 }
             }
         }
+        .onAppear { showBluetoothError = positioning.bluetoothError != nil }
         .onChange(of: positioning.bluetoothError) { _, error in
-            withAnimation {
-                bluetoothError = error
-                showBluetoothError = true
-            }
+            showBluetoothError = error != nil
         }
         // TODO: Improve if we loose our location. (#40)
         .overlay {
@@ -129,45 +126,48 @@ struct MapView: View {
             }
         }
         .overlay(alignment: .top) {
-            if let bluetoothError {
-                HStack(alignment: .firstTextBaseline) {
-                    Image(systemName: "exclamationmark.octagon.fill")
+            Group {
+                if let bluetoothError = positioning.bluetoothError {
+                    HStack(alignment: .firstTextBaseline) {
+                        Image(systemName: "exclamationmark.octagon.fill")
 
-                    if showBluetoothError {
-                        switch bluetoothError {
-                        case .poweredOff:
-                            Text(
-                                "Bluetooth is turned off.\nPlease enable it in Settings."
-                            )
-                        case .resetting:
-                            Text(
-                                "Bluetooth is restarting.\nPlease wait a moment and try again."
-                            )
-                        case .unauthorized:
-                            Text(
-                                "This app needs Bluetooth permission.\nPlease enable it in Settings."
-                            )
-                        case .unknown:
-                            Text(
-                                "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
-                            )
-                        case .unsupported:
-                            Text(
-                                "This device does not support Bluetooth LE.\nA compatible device is required."
-                            )
-                        @unknown default:
-                            Text("An unexpected Bluetooth error occurred.")
+                        if showBluetoothError {
+                            switch bluetoothError {
+                            case .poweredOff:
+                                Text(
+                                    "Bluetooth is turned off.\nPlease enable it in Settings."
+                                )
+                            case .resetting:
+                                Text(
+                                    "Bluetooth is restarting.\nPlease wait a moment and try again."
+                                )
+                            case .unauthorized:
+                                Text(
+                                    "This app needs Bluetooth permission.\nPlease enable it in Settings."
+                                )
+                            case .unknown:
+                                Text(
+                                    "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
+                                )
+                            case .unsupported:
+                                Text(
+                                    "This device does not support Bluetooth LE.\nA compatible device is required."
+                                )
+                            @unknown default:
+                                Text("An unexpected Bluetooth error occurred.")
+                            }
                         }
                     }
-                }
-                .padding()
-                .background(.background)
-                .foregroundStyle(.red)
-                .clipShape(.rect(cornerRadius: 8))
-                .onTapGesture {
-                    withAnimation { showBluetoothError.toggle() }
+                    .padding()
+                    .background(.background)
+                    .foregroundStyle(.red)
+                    .clipShape(.rect(cornerRadius: 8))
+                    .onTapGesture {
+                        withAnimation { showBluetoothError.toggle() }
+                    }
                 }
             }
+            .animation(.easeInOut, value: positioning.bluetoothError)
         }
     }
 
