@@ -20,6 +20,9 @@ struct MapView: View {
     @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
+    @State private var bluetoothError: BluetoothError?
+    @State private var showBluetoothError = false
+
     var body: some View {
         TileOverlayMapView(
             bearing: bearing,
@@ -59,6 +62,12 @@ struct MapView: View {
                 }
             }
         }
+        .onChange(of: positioning.bluetoothError) { _, error in
+            withAnimation {
+                bluetoothError = error
+                showBluetoothError = true
+            }
+        }
         // TODO: Improve if we loose our location. (#40)
         .overlay {
             if positioning.location == nil && floorID == nil {
@@ -67,7 +76,7 @@ struct MapView: View {
                 }
             }
         }
-        .overlay(
+        .overlay(alignment: .topLeading) {
             Menu {
                 Button {
                     Task {
@@ -116,10 +125,50 @@ struct MapView: View {
                 Image(systemName: "line.3.horizontal.circle.fill")
                     .font(.largeTitle)
                     .foregroundStyle(.gray, .background)
-                    .padding()
-            },
-            alignment: .topLeading
-        )
+                    .padding(.horizontal)
+            }
+        }
+        .overlay(alignment: .top) {
+            if let bluetoothError {
+                HStack(alignment: .firstTextBaseline) {
+                    Image(systemName: "exclamationmark.octagon.fill")
+
+                    if showBluetoothError {
+                        switch bluetoothError {
+                        case .poweredOff:
+                            Text(
+                                "Bluetooth is turned off.\nPlease enable it in Settings."
+                            )
+                        case .resetting:
+                            Text(
+                                "Bluetooth is restarting.\nPlease wait a moment and try again."
+                            )
+                        case .unauthorized:
+                            Text(
+                                "This app needs Bluetooth permission.\nPlease enable it in Settings."
+                            )
+                        case .unknown:
+                            Text(
+                                "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
+                            )
+                        case .unsupported:
+                            Text(
+                                "This device does not support Bluetooth LE.\nA compatible device is required."
+                            )
+                        @unknown default:
+                            Text("An unexpected Bluetooth error occurred.")
+                        }
+                    }
+                }
+                .padding()
+                .background(.background)
+                .foregroundStyle(.red)
+                .clipShape(.rect(cornerRadius: 8))
+                .onTapGesture {
+                    withAnimation { showBluetoothError.toggle() }
+                }
+            }
+        }
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
