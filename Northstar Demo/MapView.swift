@@ -20,7 +20,9 @@ struct MapView: View {
     @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
-    @State private var showBluetoothError = false
+    @Namespace private var animation
+    @State private var diagnosticsCount = 0
+    @State private var showPositioningDiagnostics = false
 
     var body: some View {
         TileOverlayMapView(
@@ -61,9 +63,12 @@ struct MapView: View {
                 }
             }
         }
-        .onAppear { showBluetoothError = positioning.bluetoothError != nil }
-        .onChange(of: positioning.bluetoothError) { _, error in
-            showBluetoothError = error != nil
+        .onAppear { syncPositioningDiagnosticsVisibility() }
+        .onChange(of: positioning.bluetoothError) { _, _ in
+            syncPositioningDiagnosticsVisibility()
+        }
+        .onChange(of: positioning.motionDataWarning) { _, _ in
+            syncPositioningDiagnosticsVisibility()
         }
         // TODO: Improve if we loose our location. (#40)
         .overlay {
@@ -126,48 +131,68 @@ struct MapView: View {
         }
         .overlay(alignment: .top) {
             Group {
-                if let bluetoothError = positioning.bluetoothError {
-                    HStack(alignment: .firstTextBaseline) {
-                        Image(systemName: "exclamationmark.octagon.fill")
+                if positioning.bluetoothError != nil
+                    || positioning.motionDataWarning != nil
+                {
 
-                        if showBluetoothError {
-                            switch bluetoothError {
-                            case .poweredOff:
-                                Text(
-                                    "Bluetooth is turned off.\nPlease enable it in Settings."
-                                )
-                            case .resetting:
-                                Text(
-                                    "Bluetooth is restarting.\nPlease wait a moment and try again."
-                                )
-                            case .unauthorized:
-                                Text(
-                                    "This app needs Bluetooth permission.\nPlease enable it in Settings."
-                                )
-                            case .unknown:
-                                Text(
-                                    "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
-                                )
-                            case .unsupported:
-                                Text(
-                                    "This device does not support Bluetooth LE.\nA compatible device is required."
-                                )
-                            @unknown default:
-                                Text("An unexpected Bluetooth error occurred.")
+                    let content = Group {
+                        if let bluetoothError = positioning.bluetoothError {
+                            PositioningDiagnostic(
+                                expanded: showPositioningDiagnostics,
+                                id: "bluetoothError",
+                                message: bluetoothError.message,
+                                namespace: animation,
+                                severity: .error
+                            )
+                        }
+
+                        if let motionDataWarning = positioning.motionDataWarning
+                        {
+                            PositioningDiagnostic(
+                                expanded: showPositioningDiagnostics,
+                                id: "motionDataWarning",
+                                message: motionDataWarning.message,
+                                namespace: animation,
+                                severity: .warning
+                            )
+                        }
+                    }
+
+                    Group {
+                        if showPositioningDiagnostics {
+                            VStack(alignment: .leading, spacing: 16) {
+                                content
+                            }
+                        } else {
+                            HStack {
+                                content
                             }
                         }
                     }
                     .padding()
-                    .background(.background)
-                    .foregroundStyle(.red)
-                    .clipShape(.rect(cornerRadius: 8))
-                    .onTapGesture {
-                        withAnimation { showBluetoothError.toggle() }
-                    }
                 }
             }
+            .background(.background)
+            .clipShape(.rect(cornerRadius: 8))
+            .onTapGesture {
+                withAnimation { showPositioningDiagnostics.toggle() }
+            }
             .animation(.easeInOut, value: positioning.bluetoothError)
+            .animation(.easeInOut, value: positioning.motionDataWarning)
         }
+    }
+
+    private func syncPositioningDiagnosticsVisibility() {
+        let newDiagnosticsCount = [
+            positioning.bluetoothError != nil,
+            positioning.motionDataWarning != nil,
+        ].filter { $0 }.count
+
+        if newDiagnosticsCount > diagnosticsCount {
+            showPositioningDiagnostics = true
+        }
+
+        diagnosticsCount = newDiagnosticsCount
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
@@ -308,6 +333,64 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 return MKTileOverlayRenderer(tileOverlay: tileOverlay)
             }
             return MKOverlayRenderer(overlay: overlay)
+        }
+    }
+}
+
+private struct PositioningDiagnostic: View {
+    let expanded: Bool
+    let id: String
+    let message: String
+    let namespace: Namespace.ID
+    let severity: Severity
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Image(
+                systemName: severity == .error
+                    ? "exclamationmark.octagon.fill"
+                    : "exclamationmark.triangle.fill"
+            )
+            .matchedGeometryEffect(id: id, in: namespace)
+
+            if expanded {
+                Text(message)
+            }
+        }
+        .foregroundStyle(severity == .error ? .red : .orange)
+    }
+
+    enum Severity { case error, warning }
+}
+extension BluetoothError {
+    var message: String {
+        switch self {
+        case .poweredOff:
+            "Bluetooth is turned off.\nPlease enable it in Settings."
+        case .resetting:
+            "Bluetooth is restarting.\nPlease wait a moment and try again."
+        case .unauthorized:
+            "This app needs Bluetooth permission.\nPlease enable it in Settings."
+        case .unknown:
+            "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
+        case .unsupported:
+            "This device does not support Bluetooth LE.\nA compatible device is required."
+        @unknown default:
+            "An unexpected Bluetooth error occurred."
+        }
+    }
+}
+extension MotionDataWarning {
+    var message: String {
+        switch self {
+        case .denied:
+            "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
+        case .restricted:
+            "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
+        case .unavailable:
+            "Motion data unavailable on this device.\nPositioning performance will be reduced."
+        @unknown default:
+            "An unexpected motion data warning occurred."
         }
     }
 }
