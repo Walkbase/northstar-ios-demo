@@ -122,7 +122,6 @@ struct MapView: View {
                 Image(systemName: "line.3.horizontal.circle.fill")
                     .font(.largeTitle)
                     .foregroundStyle(.gray, .background)
-                    .padding(.horizontal)
             }
         }
         .overlay(alignment: .top) {
