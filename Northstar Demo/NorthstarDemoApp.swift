@@ -5,8 +5,7 @@ import SwiftUI
 
 @main
 struct NorthstarDemoApp: App {
-    private var appData = AppData()
-    private var positioning = Positioning()
+    @State private var appData = AppData()
 
     init() {
         SentrySDK.start { options in
@@ -19,9 +18,7 @@ struct NorthstarDemoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(appData)
-                .environment(positioning)
+            ContentView().environment(appData)
         }
     }
 }

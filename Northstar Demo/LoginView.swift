@@ -3,9 +3,10 @@ import Northstar
 import SwiftUI
 
 struct LoginView: View {
+    var onLogin: (Positioning) -> Void
+
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
     @Environment(AppData.self) private var appData: AppData
-    @Environment(Positioning.self) private var positioning: Positioning
 
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
@@ -269,6 +270,7 @@ struct LoginView: View {
             }
 
             do {
+                let positioning = Positioning()
                 try await positioning.registerDevice(
                     using: apiKey,
                     in: selectedRegion,
@@ -289,6 +291,7 @@ struct LoginView: View {
                     appData.isLoggedIn = true
                 } completion: {
                     shouldCheckLoginStatus = true
+                    onLogin(positioning)
                 }
             } catch {
                 shouldCheckLoginStatus = false
@@ -327,6 +330,7 @@ struct LoginView: View {
         }
 
         do {
+            let positioning = Positioning()
             try await positioning.registerDevice(
                 using: apiKey,
                 in: selectedRegion,
@@ -337,6 +341,7 @@ struct LoginView: View {
                 appData.isLoggedIn = true
             } completion: {
                 shouldCheckLoginStatus = true
+                onLogin(positioning)
             }
         } catch {
             alertMessage =
@@ -350,7 +355,6 @@ struct LoginView: View {
 
 #Preview {
     @Previewable var appData = AppData()
-    @Previewable var positioning = Positioning()
 
-    LoginView().environment(appData).environment(positioning)
+    LoginView(onLogin: { _ in }).environment(appData)
 }

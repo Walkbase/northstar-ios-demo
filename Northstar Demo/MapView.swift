@@ -7,8 +7,9 @@ import SwiftUI
 private let logger = SentrySDK.logger
 
 struct MapView: View {
+    var positioning: Positioning
+
     @Environment(AppData.self) var appData: AppData
-    @Environment(Positioning.self) var positioning: Positioning
 
     @AppStorage("apiKey") var apiKey = ""
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
@@ -399,5 +400,5 @@ extension MotionDataWarning {
     @Previewable var appData = AppData()
     @Previewable var positioning = Positioning()
 
-    MapView().environment(appData).environment(positioning)
+    MapView(positioning: positioning).environment(appData)
 }
