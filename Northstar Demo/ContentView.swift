@@ -3,19 +3,24 @@ import Northstar
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(AppData.self) private var appData: AppData
     @State private var positioning: Positioning?
 
     var body: some View {
-        if appData.isLoggedIn, let positioning {
-            MapView(positioning: positioning)
-                .transition(.opacity)
-                .onDisappear {
-                    self.positioning = nil
-                }
+        if let positioning {
+            MapView(
+                onLogout: {
+                    withAnimation(.easeInOut) {
+                        self.positioning = nil
+                    }
+                },
+                positioning: positioning
+            )
+            .transition(.opacity)
         } else {
             LoginView(onLogin: { positioning in
-                self.positioning = positioning
+                withAnimation(.easeInOut) {
+                    self.positioning = positioning
+                }
             })
             .transition(.opacity)
         }
@@ -23,7 +28,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    @Previewable var appData = AppData()
-
-    ContentView().environment(appData)
+    ContentView()
 }

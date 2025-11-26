@@ -6,7 +6,6 @@ struct LoginView: View {
     var onLogin: (Positioning) -> Void
 
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
-    @Environment(AppData.self) private var appData: AppData
 
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
@@ -35,8 +34,6 @@ struct LoginView: View {
     @State private var isKeyboardHidden = true
 
     var body: some View {
-        @Bindable var appData = appData
-
         GeometryReader { geometry in
             ScrollView {
                 VStack {
@@ -288,10 +285,9 @@ struct LoginView: View {
                 }
 
                 withAnimation(.easeInOut) {
-                    appData.isLoggedIn = true
+                    onLogin(positioning)
                 } completion: {
                     shouldCheckLoginStatus = true
-                    onLogin(positioning)
                 }
             } catch {
                 shouldCheckLoginStatus = false
@@ -306,17 +302,16 @@ struct LoginView: View {
 
     private func submit() async {
         focusedField = nil
-        isLoading = true
         await logIn()
-        isLoading = false
     }
 
     private func logIn() async {
+        isLoading = true
+
         let parameters: Parameters = [
             "username": email, "password": password,
         ]
         let response = await AF.request(
-            // TODO: Abstract to `appData`. (#53)
             "https://analytics-\(selectedRegion).walkbase.com/api/j/login",
             method: .post,
             parameters: parameters,
@@ -338,12 +333,13 @@ struct LoginView: View {
                 for: "northstar-demo"
             )
             withAnimation(.easeInOut) {
-                appData.isLoggedIn = true
-            } completion: {
-                shouldCheckLoginStatus = true
                 onLogin(positioning)
+            } completion: {
+                isLoading = false
+                shouldCheckLoginStatus = true
             }
         } catch {
+            isLoading = false
             alertMessage =
                 "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
             showAlert = true
@@ -354,7 +350,5 @@ struct LoginView: View {
 // MARK: Preview
 
 #Preview {
-    @Previewable var appData = AppData()
-
-    LoginView(onLogin: { _ in }).environment(appData)
+    LoginView(onLogin: { _ in })
 }

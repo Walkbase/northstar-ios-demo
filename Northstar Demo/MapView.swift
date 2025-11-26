@@ -7,9 +7,8 @@ import SwiftUI
 private let logger = SentrySDK.logger
 
 struct MapView: View {
+    var onLogout: () -> Void
     var positioning: Positioning
-
-    @Environment(AppData.self) var appData: AppData
 
     @AppStorage("apiKey") var apiKey = ""
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
@@ -56,7 +55,6 @@ struct MapView: View {
                         bearing = floor.bearing
                         maxZoom = floor.tiles.max_zoom
                         minZoom = floor.tiles.min_zoom
-                        // TODO: Abstract to `appData`. (#53)
                         urlTemplate =
                             "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
                         floorID = latestFloorID
@@ -97,9 +95,7 @@ struct MapView: View {
                         switch response.result {
                         case .success:
                             shouldCheckLoginStatus = false
-                            withAnimation(.easeInOut) {
-                                appData.isLoggedIn = false
-                            }
+                            onLogout()
                         case .failure(let error):
                             if let statusCode = response.response?.statusCode {
                                 logger.error("HTTP status code: \(statusCode)")
@@ -198,7 +194,6 @@ struct MapView: View {
 
     // TODO: Should throw instead of returning `nil`. (#41).
     private func fetchFloor(using floorID: Int) async -> FloorResponse? {
-        // TODO: Abstract to `appData`. (#53)
         let response = await AF.request(
             "https://analytics-\(selectedRegion).walkbase.com/api/j/floors/v2/\(floorID)"
         )
@@ -397,8 +392,6 @@ extension MotionDataWarning {
 }
 
 #Preview {
-    @Previewable var appData = AppData()
     @Previewable var positioning = Positioning()
-
-    MapView(positioning: positioning).environment(appData)
+    MapView(onLogout: {}, positioning: positioning)
 }

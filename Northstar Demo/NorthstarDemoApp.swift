@@ -5,8 +5,6 @@ import SwiftUI
 
 @main
 struct NorthstarDemoApp: App {
-    @State private var appData = AppData()
-
     init() {
         SentrySDK.start { options in
             options.dsn =
@@ -18,12 +16,7 @@ struct NorthstarDemoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView().environment(appData)
+            ContentView()
         }
     }
-}
-
-@Observable
-class AppData {
-    var isLoggedIn = false
 }
