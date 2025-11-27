@@ -21,7 +21,6 @@ struct MapView: View {
     @State private var urlTemplate: String?
 
     @Namespace private var animation
-    @State private var diagnosticsCount = 0
     @State private var showPositioningDiagnostics = false
 
     var body: some View {
@@ -61,13 +60,6 @@ struct MapView: View {
                     }
                 }
             }
-        }
-        .onAppear { syncPositioningDiagnosticsVisibility() }
-        .onChange(of: positioning.bluetoothError) { _, _ in
-            syncPositioningDiagnosticsVisibility()
-        }
-        .onChange(of: positioning.motionDataWarning) { _, _ in
-            syncPositioningDiagnosticsVisibility()
         }
         // TODO: Improve if we loose our location. (#40)
         .overlay {
@@ -177,19 +169,6 @@ struct MapView: View {
             .animation(.easeInOut, value: positioning.bluetoothError)
             .animation(.easeInOut, value: positioning.motionDataWarning)
         }
-    }
-
-    private func syncPositioningDiagnosticsVisibility() {
-        let newDiagnosticsCount = [
-            positioning.bluetoothError != nil,
-            positioning.motionDataWarning != nil,
-        ].filter { $0 }.count
-
-        if newDiagnosticsCount > diagnosticsCount {
-            showPositioningDiagnostics = true
-        }
-
-        diagnosticsCount = newDiagnosticsCount
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
