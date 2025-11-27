@@ -122,6 +122,7 @@ struct MapView: View {
             Group {
                 if positioning.bluetoothError != nil
                     || positioning.motionDataWarning != nil
+                    || positioning.networkError != nil
                 {
 
                     let content = Group {
@@ -130,6 +131,16 @@ struct MapView: View {
                                 expanded: showPositioningDiagnostics,
                                 id: "bluetoothError",
                                 message: bluetoothError.message,
+                                namespace: animation,
+                                severity: .error
+                            )
+                        }
+
+                        if let networkError = positioning.networkError {
+                            PositioningDiagnostic(
+                                expanded: showPositioningDiagnostics,
+                                id: "networkError",
+                                message: networkError.message,
                                 namespace: animation,
                                 severity: .error
                             )
@@ -168,6 +179,7 @@ struct MapView: View {
             }
             .animation(.easeInOut, value: positioning.bluetoothError)
             .animation(.easeInOut, value: positioning.motionDataWarning)
+            .animation(.easeInOut, value: positioning.networkError)
         }
     }
 
@@ -343,7 +355,7 @@ extension BluetoothError {
         case .poweredOff:
             "Bluetooth is turned off.\nPlease enable it in Settings."
         case .resetting:
-            "Bluetooth is restarting.\nPlease wait a moment and try again."
+            "Bluetooth is restarting.\nPlease wait."
         case .unauthorized:
             "This app needs Bluetooth permission.\nPlease enable it in Settings."
         case .unknown:
@@ -366,6 +378,18 @@ extension MotionDataWarning {
             "Motion data unavailable on this device.\nPositioning performance will be reduced."
         @unknown default:
             "An unexpected motion data warning occurred."
+        }
+    }
+}
+extension NetworkError {
+    var message: String {
+        switch self {
+        case .requiresConnection:
+            "No internet connection.\nYou may need to connect to Wi-Fi, enable cellular data, or sign in to a network."
+        case .unsatisfied:
+            "No internet connection.\nPlease check your network settings."
+        @unknown default:
+            "An unexpected network error occurred."
         }
     }
 }
