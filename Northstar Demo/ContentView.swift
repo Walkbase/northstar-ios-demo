@@ -27,6 +27,12 @@ struct ContentView: View {
     }
 }
 
+// MARK: Previews
+
 #Preview {
     ContentView()
+}
+
+#Preview {
+    ContentView().preferredColorScheme(.dark)
 }

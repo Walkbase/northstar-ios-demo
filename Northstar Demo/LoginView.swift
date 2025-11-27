@@ -77,7 +77,7 @@ struct LoginView: View {
                             .onAppear {
                                 UISegmentedControl.appearance()
                                     .setTitleTextAttributes(
-                                        [.foregroundColor: UIColor.black],
+                                        [.foregroundColor: UIColor.label],
                                         for: .selected
                                     )
                                 UISegmentedControl.appearance()
@@ -347,8 +347,12 @@ struct LoginView: View {
     }
 }
 
-// MARK: Preview
+// MARK: Previews
 
 #Preview {
     LoginView(onLogin: { _ in })
+}
+
+#Preview {
+    LoginView(onLogin: { _ in }).preferredColorScheme(.dark)
 }
