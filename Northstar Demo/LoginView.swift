@@ -77,7 +77,7 @@ struct LoginView: View {
                             .onAppear {
                                 UISegmentedControl.appearance()
                                     .setTitleTextAttributes(
-                                        [.foregroundColor: UIColor.black],
+                                        [.foregroundColor: UIColor.label],
                                         for: .selected
                                     )
                                 UISegmentedControl.appearance()
