@@ -391,7 +391,14 @@ extension MotionDataWarning {
     }
 }
 
+// MARK: Previews
+
 #Preview {
     @Previewable var positioning = Positioning()
     MapView(onLogout: {}, positioning: positioning)
+}
+
+#Preview {
+    @Previewable var positioning = Positioning()
+    MapView(onLogout: {}, positioning: positioning).preferredColorScheme(.dark)
 }

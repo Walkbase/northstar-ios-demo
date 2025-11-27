@@ -347,8 +347,12 @@ struct LoginView: View {
     }
 }
 
-// MARK: Preview
+// MARK: Previews
 
 #Preview {
     LoginView(onLogin: { _ in })
+}
+
+#Preview {
+    LoginView(onLogin: { _ in }).preferredColorScheme(.dark)
 }
