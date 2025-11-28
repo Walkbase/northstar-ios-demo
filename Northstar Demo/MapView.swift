@@ -120,40 +120,18 @@ struct MapView: View {
         }
         .overlay(alignment: .top) {
             Group {
-                if positioning.bluetoothError != nil
-                    || positioning.motionDataWarning != nil
-                    || positioning.networkError != nil
-                {
+                if positioning.diagnostics.isEmpty == false {
 
                     let content = Group {
-                        if let bluetoothError = positioning.bluetoothError {
+                        ForEach(Array(positioning.diagnostics), id: \.key) {
+                            type,
+                            diagnostic in
                             PositioningDiagnostic(
                                 expanded: showPositioningDiagnostics,
-                                id: "bluetoothError",
-                                message: bluetoothError.message,
+                                message: diagnostic.message,
                                 namespace: animation,
-                                severity: .error
-                            )
-                        }
-
-                        if let networkError = positioning.networkError {
-                            PositioningDiagnostic(
-                                expanded: showPositioningDiagnostics,
-                                id: "networkError",
-                                message: networkError.message,
-                                namespace: animation,
-                                severity: .error
-                            )
-                        }
-
-                        if let motionDataWarning = positioning.motionDataWarning
-                        {
-                            PositioningDiagnostic(
-                                expanded: showPositioningDiagnostics,
-                                id: "motionDataWarning",
-                                message: motionDataWarning.message,
-                                namespace: animation,
-                                severity: .warning
+                                severity: diagnostic.severity,
+                                type: type
                             )
                         }
                     }
@@ -177,9 +155,7 @@ struct MapView: View {
             .onTapGesture {
                 withAnimation { showPositioningDiagnostics.toggle() }
             }
-            .animation(.easeInOut, value: positioning.bluetoothError)
-            .animation(.easeInOut, value: positioning.motionDataWarning)
-            .animation(.easeInOut, value: positioning.networkError)
+            .animation(.easeInOut, value: positioning.diagnostics)
         }
     }
 
@@ -326,10 +302,10 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
 private struct PositioningDiagnostic: View {
     let expanded: Bool
-    let id: String
     let message: String
     let namespace: Namespace.ID
-    let severity: Severity
+    let severity: DiagnosticSeverity
+    let type: DiagnosticType
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -338,7 +314,7 @@ private struct PositioningDiagnostic: View {
                     ? "exclamationmark.octagon.fill"
                     : "exclamationmark.triangle.fill"
             )
-            .matchedGeometryEffect(id: id, in: namespace)
+            .matchedGeometryEffect(id: type, in: namespace)
 
             if expanded {
                 Text(message)
@@ -346,50 +322,56 @@ private struct PositioningDiagnostic: View {
         }
         .foregroundStyle(severity == .error ? .red : .orange)
     }
+}
 
-    enum Severity { case error, warning }
-}
-extension BluetoothError {
+extension Diagnostic {
     var message: String {
-        switch self {
-        case .poweredOff:
-            "Bluetooth is turned off.\nPlease enable it in Settings."
-        case .resetting:
-            "Bluetooth is restarting.\nPlease wait."
-        case .unauthorized:
-            "This app needs Bluetooth permission.\nPlease enable it in Settings."
-        case .unknown:
-            "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
-        case .unsupported:
-            "This device does not support Bluetooth LE.\nA compatible device is required."
+        switch code {
+        case .bluetooth(let diagnostic):
+            switch diagnostic {
+            case .poweredOff:
+                return "Bluetooth is turned off.\nPlease enable it in Settings."
+            case .resetting:
+                return "Bluetooth is restarting.\nPlease wait."
+            case .unauthorized:
+                return
+                    "This app needs Bluetooth permission.\nPlease enable it in Settings."
+            case .unknown:
+                return
+                    "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
+            case .unsupported:
+                return
+                    "This device does not support Bluetooth LE.\nA compatible device is required."
+            @unknown default:
+                return "An unexpected Bluetooth diagnostic occurred."
+            }
+        case .motionData(let diagnostic):
+            switch diagnostic {
+            case .denied:
+                return
+                    "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
+            case .restricted:
+                return
+                    "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
+            case .unavailable:
+                return
+                    "Motion data unavailable on this device.\nPositioning performance will be reduced."
+            @unknown default:
+                return "An unexpected motion data diagnostic occurred."
+            }
+        case .network(let diagnostic):
+            switch diagnostic {
+            case .requiresConnection:
+                return
+                    "No internet connection.\nYou may need to connect to Wi-Fi, enable cellular data, or sign in to a network."
+            case .unsatisfied:
+                return
+                    "No internet connection.\nPlease check your network settings."
+            @unknown default:
+                return "An unexpected network diagnostic occurred."
+            }
         @unknown default:
-            "An unexpected Bluetooth error occurred."
-        }
-    }
-}
-extension MotionDataWarning {
-    var message: String {
-        switch self {
-        case .denied:
-            "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
-        case .restricted:
-            "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
-        case .unavailable:
-            "Motion data unavailable on this device.\nPositioning performance will be reduced."
-        @unknown default:
-            "An unexpected motion data warning occurred."
-        }
-    }
-}
-extension NetworkError {
-    var message: String {
-        switch self {
-        case .requiresConnection:
-            "No internet connection.\nYou may need to connect to Wi-Fi, enable cellular data, or sign in to a network."
-        case .unsatisfied:
-            "No internet connection.\nPlease check your network settings."
-        @unknown default:
-            "An unexpected network error occurred."
+            return "An unexpected diagnostic occurred."
         }
     }
 }
