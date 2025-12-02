@@ -120,18 +120,16 @@ struct MapView: View {
         }
         .overlay(alignment: .top) {
             Group {
-                if positioning.diagnostics.isEmpty == false {
+                if positioning.diagnostics.all.isEmpty == false {
 
                     let content = Group {
-                        ForEach(Array(positioning.diagnostics), id: \.key) {
-                            type,
-                            diagnostic in
+                        ForEach(positioning.diagnostics.all) { diagnostic in
                             PositioningDiagnostic(
                                 expanded: showPositioningDiagnostics,
                                 message: diagnostic.message,
                                 namespace: animation,
                                 severity: diagnostic.severity,
-                                type: type
+                                type: diagnostic
                             )
                         }
                     }
@@ -305,7 +303,7 @@ private struct PositioningDiagnostic: View {
     let message: String
     let namespace: Namespace.ID
     let severity: DiagnosticSeverity
-    let type: DiagnosticType
+    let type: Diagnostic
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -326,7 +324,7 @@ private struct PositioningDiagnostic: View {
 
 extension Diagnostic {
     var message: String {
-        switch code {
+        switch self {
         case .bluetooth(let diagnostic):
             switch diagnostic {
             case .poweredOff:
