@@ -20,9 +20,6 @@ struct MapView: View {
     @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
-    @Namespace private var animation
-    @State private var showPositioningDiagnostics = false
-
     var body: some View {
         TileOverlayMapView(
             bearing: bearing,
@@ -119,41 +116,7 @@ struct MapView: View {
             }
         }
         .overlay(alignment: .top) {
-            Group {
-                if positioning.diagnostics.all.isEmpty == false {
-
-                    let content = Group {
-                        ForEach(positioning.diagnostics.all) { diagnostic in
-                            PositioningDiagnostic(
-                                expanded: showPositioningDiagnostics,
-                                message: diagnostic.information,
-                                namespace: animation,
-                                severity: diagnostic.severity,
-                                type: diagnostic
-                            )
-                        }
-                    }
-
-                    Group {
-                        if showPositioningDiagnostics {
-                            VStack(alignment: .leading, spacing: 16) {
-                                content
-                            }
-                        } else {
-                            HStack {
-                                content
-                            }
-                        }
-                    }
-                    .padding()
-                }
-            }
-            .background(.background)
-            .clipShape(.rect(cornerRadius: 8))
-            .onTapGesture {
-                withAnimation { showPositioningDiagnostics.toggle() }
-            }
-            .animation(.easeInOut, value: positioning.diagnostics)
+            DiagnosticsView(positioning: positioning)
         }
     }
 
@@ -295,6 +258,51 @@ private struct TileOverlayMapView: UIViewRepresentable {
             }
             return MKOverlayRenderer(overlay: overlay)
         }
+    }
+}
+
+private struct DiagnosticsView: View {
+    var positioning: Positioning
+
+    @Namespace private var animation
+    @State private var showPositioningDiagnostics = false
+
+    var body: some View {
+        Group {
+            if positioning.diagnostics.all.isEmpty == false {
+
+                let content = Group {
+                    ForEach(positioning.diagnostics.all) { diagnostic in
+                        PositioningDiagnostic(
+                            expanded: showPositioningDiagnostics,
+                            message: diagnostic.information,
+                            namespace: animation,
+                            severity: diagnostic.severity,
+                            type: diagnostic
+                        )
+                    }
+                }
+
+                Group {
+                    if showPositioningDiagnostics {
+                        VStack(alignment: .leading, spacing: 16) {
+                            content
+                        }
+                    } else {
+                        HStack {
+                            content
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+        .background(.background)
+        .clipShape(.rect(cornerRadius: 8))
+        .onTapGesture {
+            withAnimation { showPositioningDiagnostics.toggle() }
+        }
+        .animation(.easeInOut, value: positioning.diagnostics)
     }
 }
 
