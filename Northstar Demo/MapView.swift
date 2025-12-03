@@ -126,7 +126,7 @@ struct MapView: View {
                         ForEach(positioning.diagnostics.all) { diagnostic in
                             PositioningDiagnostic(
                                 expanded: showPositioningDiagnostics,
-                                message: diagnostic.message,
+                                message: diagnostic.information,
                                 namespace: animation,
                                 severity: diagnostic.severity,
                                 type: diagnostic
@@ -323,7 +323,7 @@ private struct PositioningDiagnostic: View {
 }
 
 extension Diagnostic {
-    var message: String {
+    var information: String {
         switch self {
         case .bluetooth(let diagnostic):
             switch diagnostic {
