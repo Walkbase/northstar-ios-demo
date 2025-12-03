@@ -270,17 +270,15 @@ private struct DiagnosticsView: View {
     var body: some View {
         Group {
             if positioning.diagnostics.all.isEmpty == false {
-
-                let content = Group {
-                    ForEach(positioning.diagnostics.all) { diagnostic in
-                        PositioningDiagnostic(
-                            expanded: showPositioningDiagnostics,
-                            message: diagnostic.information,
-                            namespace: animation,
-                            severity: diagnostic.severity,
-                            type: diagnostic
-                        )
-                    }
+                let content = ForEach(positioning.diagnostics.all) {
+                    diagnostic in
+                    PositioningDiagnostic(
+                        expanded: showPositioningDiagnostics,
+                        message: diagnostic.information,
+                        namespace: animation,
+                        severity: diagnostic.severity,
+                        type: diagnostic
+                    )
                 }
 
                 Group {
