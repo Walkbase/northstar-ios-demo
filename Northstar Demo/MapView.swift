@@ -20,10 +20,6 @@ struct MapView: View {
     @State private var minZoom: Int?
     @State private var urlTemplate: String?
 
-    @Namespace private var animation
-    @State private var diagnosticsCount = 0
-    @State private var showPositioningDiagnostics = false
-
     var body: some View {
         TileOverlayMapView(
             bearing: bearing,
@@ -61,13 +57,6 @@ struct MapView: View {
                     }
                 }
             }
-        }
-        .onAppear { syncPositioningDiagnosticsVisibility() }
-        .onChange(of: positioning.bluetoothError) { _, _ in
-            syncPositioningDiagnosticsVisibility()
-        }
-        .onChange(of: positioning.motionDataWarning) { _, _ in
-            syncPositioningDiagnosticsVisibility()
         }
         // TODO: Improve if we loose our location. (#40)
         .overlay {
@@ -127,69 +116,8 @@ struct MapView: View {
             }
         }
         .overlay(alignment: .top) {
-            Group {
-                if positioning.bluetoothError != nil
-                    || positioning.motionDataWarning != nil
-                {
-
-                    let content = Group {
-                        if let bluetoothError = positioning.bluetoothError {
-                            PositioningDiagnostic(
-                                expanded: showPositioningDiagnostics,
-                                id: "bluetoothError",
-                                message: bluetoothError.message,
-                                namespace: animation,
-                                severity: .error
-                            )
-                        }
-
-                        if let motionDataWarning = positioning.motionDataWarning
-                        {
-                            PositioningDiagnostic(
-                                expanded: showPositioningDiagnostics,
-                                id: "motionDataWarning",
-                                message: motionDataWarning.message,
-                                namespace: animation,
-                                severity: .warning
-                            )
-                        }
-                    }
-
-                    Group {
-                        if showPositioningDiagnostics {
-                            VStack(alignment: .leading, spacing: 16) {
-                                content
-                            }
-                        } else {
-                            HStack {
-                                content
-                            }
-                        }
-                    }
-                    .padding()
-                }
-            }
-            .background(.background)
-            .clipShape(.rect(cornerRadius: 8))
-            .onTapGesture {
-                withAnimation { showPositioningDiagnostics.toggle() }
-            }
-            .animation(.easeInOut, value: positioning.bluetoothError)
-            .animation(.easeInOut, value: positioning.motionDataWarning)
+            DiagnosticsView(positioning: positioning)
         }
-    }
-
-    private func syncPositioningDiagnosticsVisibility() {
-        let newDiagnosticsCount = [
-            positioning.bluetoothError != nil,
-            positioning.motionDataWarning != nil,
-        ].filter { $0 }.count
-
-        if newDiagnosticsCount > diagnosticsCount {
-            showPositioningDiagnostics = true
-        }
-
-        diagnosticsCount = newDiagnosticsCount
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
@@ -333,12 +261,55 @@ private struct TileOverlayMapView: UIViewRepresentable {
     }
 }
 
+private struct DiagnosticsView: View {
+    var positioning: Positioning
+
+    @Namespace private var animation
+    @State private var showPositioningDiagnostics = false
+
+    var body: some View {
+        Group {
+            if positioning.diagnostics.all.isEmpty == false {
+                let content = ForEach(positioning.diagnostics.all) {
+                    diagnostic in
+                    PositioningDiagnostic(
+                        expanded: showPositioningDiagnostics,
+                        message: diagnostic.information,
+                        namespace: animation,
+                        severity: diagnostic.severity,
+                        type: diagnostic
+                    )
+                }
+
+                Group {
+                    if showPositioningDiagnostics {
+                        VStack(alignment: .leading, spacing: 16) {
+                            content
+                        }
+                    } else {
+                        HStack {
+                            content
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+        .background(.background)
+        .clipShape(.rect(cornerRadius: 8))
+        .onTapGesture {
+            withAnimation { showPositioningDiagnostics.toggle() }
+        }
+        .animation(.easeInOut, value: positioning.diagnostics)
+    }
+}
+
 private struct PositioningDiagnostic: View {
     let expanded: Bool
-    let id: String
     let message: String
     let namespace: Namespace.ID
-    let severity: Severity
+    let severity: DiagnosticSeverity
+    let type: Diagnostic
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -347,7 +318,7 @@ private struct PositioningDiagnostic: View {
                     ? "exclamationmark.octagon.fill"
                     : "exclamationmark.triangle.fill"
             )
-            .matchedGeometryEffect(id: id, in: namespace)
+            .matchedGeometryEffect(id: type, in: namespace)
 
             if expanded {
                 Text(message)
@@ -355,38 +326,56 @@ private struct PositioningDiagnostic: View {
         }
         .foregroundStyle(severity == .error ? .red : .orange)
     }
+}
 
-    enum Severity { case error, warning }
-}
-extension BluetoothError {
-    var message: String {
+extension Diagnostic {
+    var information: String {
         switch self {
-        case .poweredOff:
-            "Bluetooth is turned off.\nPlease enable it in Settings."
-        case .resetting:
-            "Bluetooth is restarting.\nPlease wait a moment and try again."
-        case .unauthorized:
-            "This app needs Bluetooth permission.\nPlease enable it in Settings."
-        case .unknown:
-            "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
-        case .unsupported:
-            "This device does not support Bluetooth LE.\nA compatible device is required."
+        case .bluetooth(let diagnostic):
+            switch diagnostic {
+            case .poweredOff:
+                return "Bluetooth is turned off.\nPlease enable it in Settings."
+            case .resetting:
+                return "Bluetooth is restarting.\nPlease wait."
+            case .unauthorized:
+                return
+                    "This app needs Bluetooth permission.\nPlease enable it in Settings."
+            case .unknown:
+                return
+                    "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
+            case .unsupported:
+                return
+                    "This device does not support Bluetooth LE.\nA compatible device is required."
+            @unknown default:
+                return "An unexpected Bluetooth diagnostic occurred."
+            }
+        case .motionData(let diagnostic):
+            switch diagnostic {
+            case .denied:
+                return
+                    "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
+            case .restricted:
+                return
+                    "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
+            case .unavailable:
+                return
+                    "Motion data unavailable on this device.\nPositioning performance will be reduced."
+            @unknown default:
+                return "An unexpected motion data diagnostic occurred."
+            }
+        case .network(let diagnostic):
+            switch diagnostic {
+            case .requiresConnection:
+                return
+                    "No internet connection.\nYou may need to connect to Wi-Fi, enable cellular data, or sign in to a network."
+            case .unsatisfied:
+                return
+                    "No internet connection.\nPlease check your network settings."
+            @unknown default:
+                return "An unexpected network diagnostic occurred."
+            }
         @unknown default:
-            "An unexpected Bluetooth error occurred."
-        }
-    }
-}
-extension MotionDataWarning {
-    var message: String {
-        switch self {
-        case .denied:
-            "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
-        case .restricted:
-            "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
-        case .unavailable:
-            "Motion data unavailable on this device.\nPositioning performance will be reduced."
-        @unknown default:
-            "An unexpected motion data warning occurred."
+            return "An unexpected diagnostic occurred."
         }
     }
 }

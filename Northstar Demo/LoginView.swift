@@ -318,6 +318,7 @@ struct LoginView: View {
         ).validate().serializingData().response
 
         if case .failure = response.result {
+            isLoading = false
             alertMessage =
                 "We could not sign you in.\n\nPlease check your internet connection, chosen region, and login credentials, then try again."
             showAlert = true
