@@ -349,6 +349,15 @@ extension Diagnostic {
             @unknown default:
                 return "An unexpected Bluetooth diagnostic occurred."
             }
+        case .location(let diagnostic):
+            switch diagnostic {
+            case .denied:
+                return "Location access denied.\nPositioning performance will be reduced. Enable location access in Settings for better positioning."
+           case .restricted:
+                return "Location access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
+            @unknown default:
+                return "An unexpected location diagnostic occurred."
+            }
         case .motionData(let diagnostic):
             switch diagnostic {
             case .denied:
