@@ -352,9 +352,11 @@ extension Diagnostic {
         case .location(let diagnostic):
             switch diagnostic {
             case .denied:
-                return "Location access denied.\nPositioning performance will be reduced. Enable location access in Settings for better positioning."
-           case .restricted:
-                return "Location access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
+                return
+                    "Location access denied.\nPositioning performance will be reduced. Enable location access in Settings for better positioning."
+            case .restricted:
+                return
+                    "Location access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
             @unknown default:
                 return "An unexpected location diagnostic occurred."
             }
@@ -374,6 +376,12 @@ extension Diagnostic {
             }
         case .network(let diagnostic):
             switch diagnostic {
+            case .constrained:
+                return
+                    "Limited bandwidth available.\nPositioning performance may be reduced. Connect to a Wi-Fi network if possible."
+            case .expensive:
+                return
+                    "You are using cellular data.\nPositioning performance may be reduced. Connect to a Wi-Fi network if possible."
             case .requiresConnection:
                 return
                     "No internet connection.\nYou may need to connect to Wi-Fi, enable cellular data, or sign in to a network."
