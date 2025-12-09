@@ -309,7 +309,7 @@ private struct PositioningDiagnostic: View {
     let expanded: Bool
     let message: String
     let namespace: Namespace.ID
-    let severity: DiagnosticSeverity
+    let severity: Diagnostic.Severity
     let type: Diagnostic
 
     var body: some View {
