@@ -241,8 +241,8 @@ struct LoginView: View {
                     .onAppear { rotate = true }
             }
             .foregroundStyle(.white)
-            .onChange(of: focusedField) { _, latestFocusedField in
-                isKeyboardHidden = latestFocusedField == nil
+            .onChange(of: focusedField) { _, focusedField in
+                isKeyboardHidden = focusedField == nil
             }
             .onTapGesture { focusedField = nil }
             .scrollDismissesKeyboard(.interactively)
