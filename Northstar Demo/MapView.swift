@@ -31,8 +31,8 @@ struct MapView: View {
         .ignoresSafeArea()
         .task {
             await positioning.start(
-                using: apiKey,
-                in: selectedRegion
+                in: selectedRegion,
+                apiKey: apiKey
             )
         }
         .onChange(of: positioning.position) { _, position in
