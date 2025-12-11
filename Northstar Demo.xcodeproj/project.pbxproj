@@ -498,7 +498,6 @@
 				INFOPLIST_FILE = "Northstar-Demo-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used for iBeacon advertisement.";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Used to improve positioning accuracy.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -539,7 +538,6 @@
 				INFOPLIST_FILE = "Northstar-Demo-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used for iBeacon advertisement.";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Used for Wi-Fi info retrival.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Used to improve positioning accuracy.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
