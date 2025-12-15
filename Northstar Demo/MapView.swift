@@ -334,6 +334,9 @@ extension Diagnostic {
         switch self {
         case .bluetooth(let diagnostic):
             switch diagnostic {
+            case .missingCapability:
+                return
+                    "A Bluetooth error occurred due to a configuration problem.\nPlease contact the app developer(s)."
             case .poweredOff:
                 return "Bluetooth is turned off.\nPlease enable it in Settings."
             case .resetting:
@@ -355,6 +358,9 @@ extension Diagnostic {
             case .denied:
                 return
                     "Location access denied.\nPositioning performance will be reduced. Enable location access in Settings for better positioning."
+            case .missingCapability:
+                return
+                    "Location access restricted due to a configuration problem.\nPlease contact the app developer(s)."
             case .restricted:
                 return
                     "Location access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
@@ -366,6 +372,9 @@ extension Diagnostic {
             case .denied:
                 return
                     "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
+            case .missingCapability:
+                return
+                    "Motion data access restricted due to a configuration problem.\nPlease contact the app developer(s)."
             case .restricted:
                 return
                     "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
