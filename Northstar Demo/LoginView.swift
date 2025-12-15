@@ -241,8 +241,8 @@ struct LoginView: View {
                     .onAppear { rotate = true }
             }
             .foregroundStyle(.white)
-            .onChange(of: focusedField) { _, latestFocusedField in
-                isKeyboardHidden = latestFocusedField == nil
+            .onChange(of: focusedField) { _, focusedField in
+                isKeyboardHidden = focusedField == nil
             }
             .onTapGesture { focusedField = nil }
             .scrollDismissesKeyboard(.interactively)
@@ -269,10 +269,10 @@ struct LoginView: View {
             do {
                 let positioning = Positioning()
                 try await positioning.registerDevice(
-                    using: apiKey,
                     in: selectedRegion,
+                    apiKey: apiKey,
                     // TODO: What casing should we use? (#20, SDK)
-                    for: "northstar-demo"
+                    userID: "northstar-demo"
                 )
 
                 // Ensure the sign-in check takes long enough to prevent flicker.
@@ -328,10 +328,10 @@ struct LoginView: View {
         do {
             let positioning = Positioning()
             try await positioning.registerDevice(
-                using: apiKey,
                 in: selectedRegion,
+                apiKey: apiKey,
                 // TODO: What casing should we use? (#20, SDK)
-                for: "northstar-demo"
+                userID: "northstar-demo"
             )
             withAnimation(.easeInOut) {
                 onLogin(positioning)

@@ -23,28 +23,29 @@ struct MapView: View {
     var body: some View {
         TileOverlayMapView(
             bearing: bearing,
-            location: positioning.location,
             maxZoom: maxZoom,
             minZoom: minZoom,
+            position: positioning.position,
             urlTemplate: urlTemplate
         )
         .ignoresSafeArea()
         .task {
             await positioning.start(
-                using: apiKey,
-                in: selectedRegion
+                in: selectedRegion,
+                apiKey: apiKey
             )
         }
-        .onChange(of: positioning.location) { oldLocation, location in
-            guard let latestFloorID = location?.floor_id else {
+        .onChange(of: positioning.position) { _, position in
+            guard let floorID = position?.floor_id else {
                 // TODO: Should we start a timer to clear the map? (#40)
                 return
             }
 
-            if floorID != latestFloorID {
+            // TODO: Can we use the first argument (`oldPosition`) of `onChange` instead and remove `self.floorID`?
+            if self.floorID != floorID {
                 Task {
                     let floor = await fetchFloor(
-                        using: latestFloorID
+                        using: floorID
                     )
                     // TODO: Remove when `fetchFloor` throws. (#41).
                     if let floor {
@@ -53,14 +54,14 @@ struct MapView: View {
                         minZoom = floor.tiles.min_zoom
                         urlTemplate =
                             "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
-                        floorID = latestFloorID
+                        self.floorID = floorID
                     }
                 }
             }
         }
-        // TODO: Improve if we loose our location. (#40)
+        // TODO: Improve if we loose our position. (#40)
         .overlay {
-            if positioning.location == nil && floorID == nil {
+            if positioning.position == nil && floorID == nil {
                 ProgressView {
                     Text("Positioning...")
                 }
@@ -175,9 +176,9 @@ struct MapView: View {
 
 private struct TileOverlayMapView: UIViewRepresentable {
     var bearing: Double?
-    var location: Location?
     var maxZoom: Int?
     var minZoom: Int?
+    var position: Position?
     var urlTemplate: String?
 
     func makeUIView(context: Context) -> MKMapView {
@@ -193,15 +194,15 @@ private struct TileOverlayMapView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        if let bearing, let location, let urlTemplate {
+        if let bearing, let position, let urlTemplate {
             if context.coordinator.isFirstUpdate {
                 mapView.removeAnnotations(mapView.annotations)
                 mapView.removeOverlays(mapView.overlays)
 
                 let annotation = MKPointAnnotation(
                     coordinate: CLLocationCoordinate2D(
-                        latitude: location.lat,
-                        longitude: location.lng
+                        latitude: position.lat,
+                        longitude: position.lng
                     )
                 )
                 mapView.addAnnotation(annotation)
@@ -218,8 +219,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 mapView.setCamera(
                     MKMapCamera(
                         lookingAtCenter: CLLocationCoordinate2D(
-                            latitude: location.lat,
-                            longitude: location.lng
+                            latitude: position.lat,
+                            longitude: position.lng
                         ),
                         // TODO: Calculate from polygon if possible. Or maybe we can zoom in on the overlay directly? (#39)
                         fromDistance: 200,
@@ -234,8 +235,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 if let currentAnnotation = context.coordinator.currentAnnotation
                 {
                     currentAnnotation.coordinate = CLLocationCoordinate2D(
-                        latitude: location.lat,
-                        longitude: location.lng
+                        latitude: position.lat,
+                        longitude: position.lng
                     )
                 }
             }
@@ -269,7 +270,7 @@ private struct DiagnosticsView: View {
 
     var body: some View {
         Group {
-            if positioning.diagnostics.all.isEmpty == false {
+            if !positioning.diagnostics.all.isEmpty {
                 let content = ForEach(positioning.diagnostics.all) {
                     diagnostic in
                     PositioningDiagnostic(
@@ -308,7 +309,7 @@ private struct PositioningDiagnostic: View {
     let expanded: Bool
     let message: String
     let namespace: Namespace.ID
-    let severity: DiagnosticSeverity
+    let severity: Diagnostic.Severity
     let type: Diagnostic
 
     var body: some View {
@@ -333,6 +334,9 @@ extension Diagnostic {
         switch self {
         case .bluetooth(let diagnostic):
             switch diagnostic {
+            case .missingCapability:
+                return
+                    "A Bluetooth error occurred due to a configuration problem.\nPlease contact the app developer(s)."
             case .poweredOff:
                 return "Bluetooth is turned off.\nPlease enable it in Settings."
             case .resetting:
@@ -354,6 +358,9 @@ extension Diagnostic {
             case .denied:
                 return
                     "Location access denied.\nPositioning performance will be reduced. Enable location access in Settings for better positioning."
+            case .missingCapability:
+                return
+                    "Location access restricted due to a configuration problem.\nPlease contact the app developer(s)."
             case .restricted:
                 return
                     "Location access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
@@ -365,6 +372,9 @@ extension Diagnostic {
             case .denied:
                 return
                     "Motion data access denied.\nPositioning performance will be reduced. Enable motion data access in Settings for better positioning."
+            case .missingCapability:
+                return
+                    "Motion data access restricted due to a configuration problem.\nPlease contact the app developer(s)."
             case .restricted:
                 return
                     "Motion data access restricted due to system-wide restrictions.\nPositioning performance will be reduced."
