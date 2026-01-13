@@ -196,16 +196,16 @@ private struct TileOverlayMapView: UIViewRepresentable {
     func updateUIView(_ mapView: MKMapView, context: Context) {
         guard let bearing, let position, let urlTemplate else { return }
 
+        let coordinate = CLLocationCoordinate2D(
+            latitude: position.lat,
+            longitude: position.lng
+        )
+
         if context.coordinator.isFirstUpdate {
             mapView.removeAnnotations(mapView.annotations)
             mapView.removeOverlays(mapView.overlays)
 
-            let annotation = MKPointAnnotation(
-                coordinate: CLLocationCoordinate2D(
-                    latitude: position.lat,
-                    longitude: position.lng
-                )
-            )
+            let annotation = MKPointAnnotation(coordinate: coordinate)
             mapView.addAnnotation(annotation)
             context.coordinator.currentAnnotation = annotation
 
@@ -234,10 +234,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
             context.coordinator.isFirstUpdate = false
         } else {
             if let currentAnnotation = context.coordinator.currentAnnotation {
-                currentAnnotation.coordinate = CLLocationCoordinate2D(
-                    latitude: position.lat,
-                    longitude: position.lng
-                )
+                currentAnnotation.coordinate = coordinate
             }
         }
     }
