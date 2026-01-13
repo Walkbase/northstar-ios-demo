@@ -29,8 +29,8 @@ struct MapView: View {
             urlTemplate: urlTemplate
         )
         .ignoresSafeArea()
-        .task {
-            await positioning.start(
+        .onAppear {
+            positioning.start(
                 in: selectedRegion,
                 apiKey: apiKey
             )
