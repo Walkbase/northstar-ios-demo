@@ -194,51 +194,50 @@ private struct TileOverlayMapView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        if let bearing, let position, let urlTemplate {
-            if context.coordinator.isFirstUpdate {
-                mapView.removeAnnotations(mapView.annotations)
-                mapView.removeOverlays(mapView.overlays)
+        guard let bearing, let position, let urlTemplate else { return }
 
-                let annotation = MKPointAnnotation(
-                    coordinate: CLLocationCoordinate2D(
+        if context.coordinator.isFirstUpdate {
+            mapView.removeAnnotations(mapView.annotations)
+            mapView.removeOverlays(mapView.overlays)
+
+            let annotation = MKPointAnnotation(
+                coordinate: CLLocationCoordinate2D(
+                    latitude: position.lat,
+                    longitude: position.lng
+                )
+            )
+            mapView.addAnnotation(annotation)
+            context.coordinator.currentAnnotation = annotation
+
+            let overlay = MKTileOverlay(urlTemplate: urlTemplate)
+            minZoom.map { overlay.minimumZ = $0 }
+            maxZoom.map { overlay.maximumZ = $0 }
+            mapView.addOverlay(
+                overlay,
+                level: .aboveRoads
+            )
+
+            mapView.setCamera(
+                MKMapCamera(
+                    lookingAtCenter: CLLocationCoordinate2D(
                         latitude: position.lat,
                         longitude: position.lng
-                    )
-                )
-                mapView.addAnnotation(annotation)
-                context.coordinator.currentAnnotation = annotation
-
-                let overlay = MKTileOverlay(urlTemplate: urlTemplate)
-                minZoom.map { overlay.minimumZ = $0 }
-                maxZoom.map { overlay.maximumZ = $0 }
-                mapView.addOverlay(
-                    overlay,
-                    level: .aboveRoads
-                )
-
-                mapView.setCamera(
-                    MKMapCamera(
-                        lookingAtCenter: CLLocationCoordinate2D(
-                            latitude: position.lat,
-                            longitude: position.lng
-                        ),
-                        // TODO: Calculate from polygon if possible. Or maybe we can zoom in on the overlay directly? (#39)
-                        fromDistance: 200,
-                        pitch: 0,
-                        heading: bearing
                     ),
-                    animated: true
-                )
+                    // TODO: Calculate from polygon if possible. Or maybe we can zoom in on the overlay directly? (#39)
+                    fromDistance: 200,
+                    pitch: 0,
+                    heading: bearing
+                ),
+                animated: true
+            )
 
-                context.coordinator.isFirstUpdate = false
-            } else {
-                if let currentAnnotation = context.coordinator.currentAnnotation
-                {
-                    currentAnnotation.coordinate = CLLocationCoordinate2D(
-                        latitude: position.lat,
-                        longitude: position.lng
-                    )
-                }
+            context.coordinator.isFirstUpdate = false
+        } else {
+            if let currentAnnotation = context.coordinator.currentAnnotation {
+                currentAnnotation.coordinate = CLLocationCoordinate2D(
+                    latitude: position.lat,
+                    longitude: position.lng
+                )
             }
         }
     }
