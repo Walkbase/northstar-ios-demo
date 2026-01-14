@@ -202,9 +202,6 @@ private struct TileOverlayMapView: UIViewRepresentable {
         )
 
         if context.coordinator.isFirstUpdate {
-            mapView.removeAnnotations(mapView.annotations)
-            mapView.removeOverlays(mapView.overlays)
-
             let annotation = MKPointAnnotation(coordinate: coordinate)
             mapView.addAnnotation(annotation)
             context.coordinator.annotation = annotation
