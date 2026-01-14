@@ -132,6 +132,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
                 let urlTemplate =
                     "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
+                // `MKTileOverlay` causes constant high CPU usage when displaying tiles overlays,
+                // seemingly with no workaround, and being the only available built-in alternative.
                 let overlay = MKTileOverlay(urlTemplate: urlTemplate)
                 overlay.maximumZ = floor.tiles.max_zoom
                 overlay.minimumZ = floor.tiles.min_zoom
