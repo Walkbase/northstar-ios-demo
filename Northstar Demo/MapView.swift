@@ -14,19 +14,10 @@ struct MapView: View {
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
-    @State private var bearing: Double?
-    @State private var floorID: Int?
-    @State private var maxZoom: Int?
-    @State private var minZoom: Int?
-    @State private var urlTemplate: String?
-
     var body: some View {
         TileOverlayMapView(
-            bearing: bearing,
-            maxZoom: maxZoom,
-            minZoom: minZoom,
-            position: positioning.position,
-            urlTemplate: urlTemplate
+            positioning: positioning,
+            selectedRegion: selectedRegion
         )
         .ignoresSafeArea()
         .onAppear {
@@ -35,33 +26,9 @@ struct MapView: View {
                 apiKey: apiKey
             )
         }
-        .onChange(of: positioning.position) { _, position in
-            guard let floorID = position?.floor_id else {
-                // TODO: Should we start a timer to clear the map? (#40)
-                return
-            }
-
-            // TODO: Can we use the first argument (`oldPosition`) of `onChange` instead and remove `self.floorID`?
-            if self.floorID != floorID {
-                Task {
-                    let floor = await fetchFloor(
-                        using: floorID
-                    )
-                    // TODO: Remove when `fetchFloor` throws. (#41).
-                    if let floor {
-                        bearing = floor.bearing
-                        maxZoom = floor.tiles.max_zoom
-                        minZoom = floor.tiles.min_zoom
-                        urlTemplate =
-                            "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
-                        self.floorID = floorID
-                    }
-                }
-            }
-        }
         // TODO: Improve if we loose our position. (#40)
         .overlay {
-            if positioning.position == nil && floorID == nil {
+            if positioning.position == nil {
                 ProgressView {
                     Text("Positioning...")
                 }
@@ -120,9 +87,95 @@ struct MapView: View {
             DiagnosticsView(positioning: positioning)
         }
     }
+}
+
+private struct TileOverlayMapView: UIViewRepresentable {
+    var positioning: Positioning
+    var selectedRegion: Northstar.Region
+
+    func makeUIView(context: Context) -> MKMapView {
+        let mapView = MKMapView()
+        mapView.delegate = context.coordinator
+
+        // Remove labels.
+        let config = MKStandardMapConfiguration()
+        config.pointOfInterestFilter = .excludingAll
+        mapView.preferredConfiguration = config
+
+        return mapView
+    }
+
+    func updateUIView(_ mapView: MKMapView, context: Context) {
+        guard let position = positioning.position else { return }
+
+        let coordinate = CLLocationCoordinate2D(
+            latitude: position.lat,
+            longitude: position.lng
+        )
+
+        if let annotation = context.coordinator.annotation {
+            annotation.coordinate = coordinate
+        } else {
+            let annotation = MKPointAnnotation(coordinate: coordinate)
+            mapView.addAnnotation(annotation)
+            context.coordinator.annotation = annotation
+        }
+
+        let floorID = position.floor_id
+        if floorID != context.coordinator.floorID {
+            context.coordinator.floorID = floorID
+
+            Task {
+                let floor = await fetchFloor(floorID: floorID)
+
+                guard let floor else { return }
+
+                let urlTemplate =
+                    "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
+                // `MKTileOverlay` causes constant high CPU usage when displaying tiles overlays,
+                // seemingly with no workaround, and being the only available built-in alternative.
+                let overlay = MKTileOverlay(urlTemplate: urlTemplate)
+                overlay.maximumZ = floor.tiles.max_zoom
+                overlay.minimumZ = floor.tiles.min_zoom
+                mapView.addOverlay(overlay, level: .aboveRoads)
+
+                mapView.setCamera(
+                    MKMapCamera(
+                        lookingAtCenter: CLLocationCoordinate2D(
+                            latitude: position.lat,
+                            longitude: position.lng
+                        ),
+                        // TODO: Calculate from polygon if possible. Or maybe we can zoom in on the overlay directly? (#39)
+                        fromDistance: 200,
+                        pitch: 0,
+                        heading: floor.bearing
+                    ),
+                    animated: true
+                )
+            }
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    class Coordinator: NSObject, MKMapViewDelegate {
+        var annotation: MKPointAnnotation?
+        var floorID: Int?
+
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay)
+            -> MKOverlayRenderer
+        {
+            if let tileOverlay = overlay as? MKTileOverlay {
+                return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+            }
+            return MKOverlayRenderer(overlay: overlay)
+        }
+    }
 
     // TODO: Should throw instead of returning `nil`. (#41).
-    private func fetchFloor(using floorID: Int) async -> FloorResponse? {
+    private func fetchFloor(floorID: Int) async -> FloorResponse? {
         let response = await AF.request(
             "https://analytics-\(selectedRegion).walkbase.com/api/j/floors/v2/\(floorID)"
         )
@@ -170,94 +223,6 @@ struct MapView: View {
             let id: String
             let max_zoom: Int
             let min_zoom: Int
-        }
-    }
-}
-
-private struct TileOverlayMapView: UIViewRepresentable {
-    var bearing: Double?
-    var maxZoom: Int?
-    var minZoom: Int?
-    var position: Position?
-    var urlTemplate: String?
-
-    func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
-        mapView.delegate = context.coordinator
-
-        // Remove labels.
-        let config = MKStandardMapConfiguration()
-        config.pointOfInterestFilter = .excludingAll
-        mapView.preferredConfiguration = config
-
-        return mapView
-    }
-
-    func updateUIView(_ mapView: MKMapView, context: Context) {
-        if let bearing, let position, let urlTemplate {
-            if context.coordinator.isFirstUpdate {
-                mapView.removeAnnotations(mapView.annotations)
-                mapView.removeOverlays(mapView.overlays)
-
-                let annotation = MKPointAnnotation(
-                    coordinate: CLLocationCoordinate2D(
-                        latitude: position.lat,
-                        longitude: position.lng
-                    )
-                )
-                mapView.addAnnotation(annotation)
-                context.coordinator.currentAnnotation = annotation
-
-                let overlay = MKTileOverlay(urlTemplate: urlTemplate)
-                minZoom.map { overlay.minimumZ = $0 }
-                maxZoom.map { overlay.maximumZ = $0 }
-                mapView.addOverlay(
-                    overlay,
-                    level: .aboveRoads
-                )
-
-                mapView.setCamera(
-                    MKMapCamera(
-                        lookingAtCenter: CLLocationCoordinate2D(
-                            latitude: position.lat,
-                            longitude: position.lng
-                        ),
-                        // TODO: Calculate from polygon if possible. Or maybe we can zoom in on the overlay directly? (#39)
-                        fromDistance: 200,
-                        pitch: 0,
-                        heading: bearing
-                    ),
-                    animated: true
-                )
-
-                context.coordinator.isFirstUpdate = false
-            } else {
-                if let currentAnnotation = context.coordinator.currentAnnotation
-                {
-                    currentAnnotation.coordinate = CLLocationCoordinate2D(
-                        latitude: position.lat,
-                        longitude: position.lng
-                    )
-                }
-            }
-        }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-
-    class Coordinator: NSObject, MKMapViewDelegate {
-        var currentAnnotation: MKPointAnnotation?
-        var isFirstUpdate = true
-
-        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay)
-            -> MKOverlayRenderer
-        {
-            if let tileOverlay = overlay as? MKTileOverlay {
-                return MKTileOverlayRenderer(tileOverlay: tileOverlay)
-            }
-            return MKOverlayRenderer(overlay: overlay)
         }
     }
 }
