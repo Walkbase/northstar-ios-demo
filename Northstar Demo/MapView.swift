@@ -201,7 +201,9 @@ private struct TileOverlayMapView: UIViewRepresentable {
             longitude: position.lng
         )
 
-        if context.coordinator.isFirstUpdate {
+        if let annotation = context.coordinator.annotation {
+            annotation.coordinate = coordinate
+        } else {
             let annotation = MKPointAnnotation(coordinate: coordinate)
             mapView.addAnnotation(annotation)
             context.coordinator.annotation = annotation
@@ -209,10 +211,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
             let overlay = MKTileOverlay(urlTemplate: urlTemplate)
             if let maxZoom { overlay.maximumZ = maxZoom }
             if let minZoom { overlay.minimumZ = minZoom }
-            mapView.addOverlay(
-                overlay,
-                level: .aboveRoads
-            )
+            mapView.addOverlay(overlay, level: .aboveRoads)
 
             mapView.setCamera(
                 MKMapCamera(
@@ -227,12 +226,6 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 ),
                 animated: true
             )
-
-            context.coordinator.isFirstUpdate = false
-        } else {
-            if let annotation = context.coordinator.annotation {
-                annotation.coordinate = coordinate
-            }
         }
     }
 
@@ -242,7 +235,6 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
     class Coordinator: NSObject, MKMapViewDelegate {
         var annotation: MKPointAnnotation?
-        var isFirstUpdate = true
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay)
             -> MKOverlayRenderer
