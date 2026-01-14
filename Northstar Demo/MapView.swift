@@ -207,7 +207,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
             let annotation = MKPointAnnotation(coordinate: coordinate)
             mapView.addAnnotation(annotation)
-            context.coordinator.currentAnnotation = annotation
+            context.coordinator.annotation = annotation
 
             let overlay = MKTileOverlay(urlTemplate: urlTemplate)
             if let maxZoom { overlay.maximumZ = maxZoom }
@@ -233,8 +233,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
             context.coordinator.isFirstUpdate = false
         } else {
-            if let currentAnnotation = context.coordinator.currentAnnotation {
-                currentAnnotation.coordinate = coordinate
+            if let annotation = context.coordinator.annotation {
+                annotation.coordinate = coordinate
             }
         }
     }
@@ -244,7 +244,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
-        var currentAnnotation: MKPointAnnotation?
+        var annotation: MKPointAnnotation?
         var isFirstUpdate = true
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay)
