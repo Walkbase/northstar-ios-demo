@@ -126,7 +126,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
             context.coordinator.floorID = floorID
 
             Task {
-                let floor = await fetchFloor(using: floorID)
+                let floor = await fetchFloor(floorID: floorID)
 
                 guard let floor else { return }
 
@@ -173,7 +173,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
     }
 
     // TODO: Should throw instead of returning `nil`. (#41).
-    private func fetchFloor(using floorID: Int) async -> FloorResponse? {
+    private func fetchFloor(floorID: Int) async -> FloorResponse? {
         let response = await AF.request(
             "https://analytics-\(selectedRegion).walkbase.com/api/j/floors/v2/\(floorID)"
         )
