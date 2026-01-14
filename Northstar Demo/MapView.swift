@@ -210,8 +210,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
             context.coordinator.currentAnnotation = annotation
 
             let overlay = MKTileOverlay(urlTemplate: urlTemplate)
-            minZoom.map { overlay.minimumZ = $0 }
-            maxZoom.map { overlay.maximumZ = $0 }
+            if let maxZoom { overlay.maximumZ = maxZoom }
+            if let minZoom { overlay.minimumZ = minZoom }
             mapView.addOverlay(
                 overlay,
                 level: .aboveRoads
