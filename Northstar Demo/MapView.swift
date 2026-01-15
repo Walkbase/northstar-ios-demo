@@ -308,7 +308,7 @@ extension Diagnostic {
                 return "Bluetooth is restarting.\nPlease wait."
             case .unauthorized:
                 return
-                    "This app needs Bluetooth permission.\nPlease enable it in Settings."
+                    "This app needs Bluetooth access.\nPlease enable it in Settings."
             case .unknown:
                 return
                     "A Bluetooth error occurred.\nTry restarting Bluetooth or your device."
