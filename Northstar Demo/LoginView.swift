@@ -3,7 +3,7 @@ import Northstar
 import SwiftUI
 
 struct LoginView: View {
-    var onLogin: (Positioning) -> Void
+    var onLogin: (_ positioning: Positioning) -> Void
 
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
 
