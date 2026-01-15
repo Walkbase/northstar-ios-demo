@@ -8,19 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		69FC70ED41B340C58AE498DC /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 4FE6583DF0A44499A3F9302E /* Sentry */; };
-		E10483F02E0B1DE2001AC875 /* Northstar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E10483ED2E0B1DDF001AC875 /* Northstar.framework */; };
-		E10483F12E0B1DE2001AC875 /* Northstar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E10483ED2E0B1DDF001AC875 /* Northstar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E16A4C572E1E9A9F009B6EB9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E16A4C562E1E9A9F009B6EB9 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		E10483EC2E0B1DDF001AC875 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E1E6A64B2E030E65008C737D;
-			remoteInfo = Northstar;
-		};
 		E1E6A50C2E003BA6008C737D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E1E6A4F62E003BA5008C737D /* Project object */;
@@ -37,22 +28,7 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		E10483F22E0B1DE2001AC875 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				E10483F12E0B1DE2001AC875 /* Northstar.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Northstar.xcodeproj; path = "northstar-ios/Northstar.xcodeproj"; sourceTree = "<group>"; };
 		E1E6A4FE2E003BA5008C737D /* Northstar Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Northstar Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E6A50B2E003BA6008C737D /* Northstar DemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E6A5152E003BA6008C737D /* Northstar DemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Northstar DemoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,7 +57,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E10483F02E0B1DE2001AC875 /* Northstar.framework in Frameworks */,
 				E16A4C572E1E9A9F009B6EB9 /* Alamofire in Frameworks */,
 				69FC70ED41B340C58AE498DC /* Sentry in Frameworks */,
 			);
@@ -104,29 +79,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E10483E02E0B1DDF001AC875 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		E10483E22E0B1DDF001AC875 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E10483ED2E0B1DDF001AC875 /* Northstar.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		E1E6A4F52E003BA5008C737D = {
 			isa = PBXGroup;
 			children = (
 				E1E6A5002E003BA5008C737D /* Northstar Demo */,
 				E1E6A50E2E003BA6008C737D /* Northstar DemoTests */,
 				E1E6A5182E003BA6008C737D /* Northstar DemoUITests */,
-				E10483E02E0B1DDF001AC875 /* Frameworks */,
 				E1E6A4FF2E003BA5008C737D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -151,7 +109,6 @@
 				E1E6A4FA2E003BA5008C737D /* Sources */,
 				E1E6A4FB2E003BA5008C737D /* Frameworks */,
 				E1E6A4FC2E003BA5008C737D /* Resources */,
-				E10483F22E0B1DE2001AC875 /* Embed Frameworks */,
 				DE70BB4D38D8461AADC3A7EC /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
@@ -255,12 +212,6 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E1E6A4FF2E003BA5008C737D /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = E10483E22E0B1DDF001AC875 /* Products */;
-					ProjectRef = E10483E12E0B1DDF001AC875 /* Northstar.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				E1E6A4FD2E003BA5008C737D /* Northstar Demo */,
@@ -269,16 +220,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		E10483ED2E0B1DDF001AC875 /* Northstar.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Northstar.framework;
-			remoteRef = E10483EC2E0B1DDF001AC875 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E1E6A4FC2E003BA5008C737D /* Resources */ = {
@@ -489,11 +430,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Northstar;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Northstar Demo/Northstar Demo.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = CR78ZDZ2ND;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -512,7 +452,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.walkbase.Northstar-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -529,7 +468,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Northstar;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Northstar Demo/Northstar Demo.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
