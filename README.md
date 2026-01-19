@@ -7,8 +7,8 @@
    following:
    - `Team`: Select your team/account.
    - `Bundle Identifier`: Enter a valid ID.
-1. Open the "General" tab and add `Northstar.xcframework` as a framework to the
-   project.
+1. Open the "General" tab and add `Northstar-v1.0.0-beta.1.xcframework` as a
+   framework to the project.
    - You receive the file from Walkbase.
 1. You can run now build and run the project! 🎉
 
