@@ -255,21 +255,35 @@ struct LoginView: View {
     private func logIn() async {
         isLoading = true
 
-        let parameters: Parameters = [
-            "username": email, "password": password,
-        ]
-        let response = await AF.request(
-            "https://analytics-\(selectedRegion).walkbase.com/api/j/login",
-            method: .post,
-            parameters: parameters,
-        ).validate().serializingData().response
+        let request = {
+            if shouldCheckLoginStatus {
+                return AF.request(
+                    "https://analytics-\(selectedRegion).walkbase.com/api/j/user",
+                    method: .head
+                )
+            } else {
+                let parameters: Parameters = [
+                    "username": email, "password": password,
+                ]
+                return AF.request(
+                    "https://analytics-\(selectedRegion).walkbase.com/api/j/login",
+                    method: .post,
+                    parameters: parameters
+                )
+            }
+        }()
 
+        let response = await request.validate().serializingData().response
         if case .failure = response.result {
             isLoading = false
-            shouldCheckLoginStatus = false
             alertMessage =
-                "We could not sign you in. Your session has expired or the credentials you provided were incorrect.\n\nPlease check your internet connection, chosen region, and login credentials, then try again."
+                if shouldCheckLoginStatus {
+                    "Your session has expired or there was a network issue.\n\nPlease check your internet connection, chosen region, and login credentials, then try again."
+                } else {
+                    "We could not sign you in.\n\nPlease check your internet connection, chosen region, and login credentials, then try again."
+                }
             showAlert = true
+            shouldCheckLoginStatus = false
             return
         }
 
@@ -290,10 +304,10 @@ struct LoginView: View {
             }
         } catch {
             isLoading = false
-            shouldCheckLoginStatus = false
             alertMessage =
                 "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
             showAlert = true
+            shouldCheckLoginStatus = false
         }
     }
 }
