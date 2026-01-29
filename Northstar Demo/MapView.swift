@@ -16,6 +16,9 @@ struct MapView: View {
 
     @State private var positioningStatus: String = ""
 
+    @State private var alertMessage = ""
+    @State private var showAlert = false
+
     var body: some View {
         TileOverlayMapView(
             positioning: positioning,
@@ -26,8 +29,9 @@ struct MapView: View {
             do {
                 try await positioning.start()
             } catch {
-                // TODO: Show alert and call logout.
-                print(error)
+                alertMessage =
+                    "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
+                showAlert = true
             }
         }
         .onChange(of: positioning.status) { _, status in
@@ -76,6 +80,13 @@ struct MapView: View {
         }
         .overlay(alignment: .top) {
             DiagnosticsView(positioning: positioning)
+        }
+        .alert("Something Went Wrong", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                Task { await logout() }
+            }
+        } message: {
+            Text(alertMessage)
         }
     }
 
