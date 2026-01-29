@@ -61,43 +61,7 @@ struct MapView: View {
         .overlay(alignment: .topLeading) {
             Menu {
                 Button {
-                    Task {
-                        positioning.stop()
-
-                        let response = await AF.request(
-                            "https://analytics-\(selectedRegion).walkbase.com/api/j/logout",
-                            method: .post
-                        )
-                        .validate()
-                        // TODO: Remove when backend is fixed. (#82)
-                        .serializingData(emptyResponseCodes: [200])
-                        .response
-
-                        switch response.result {
-                        case .success:
-                            logger.info("Successfully signed out")
-                        case .failure(let error):
-                            if let statusCode = response.response?.statusCode {
-                                logger.error("HTTP status code: \(statusCode)")
-                            }
-
-                            if let data = response.data,
-                                let serverMessage = String(
-                                    data: data,
-                                    encoding: .utf8
-                                )
-                            {
-                                logger.error("Server message: \(serverMessage)")
-                            }
-
-                            logger.error("Error signing out: \(error)")
-                            SentrySDK.capture(error: error)
-                        }
-
-                        // We should still sign out in the app even if the actual sign out fails.
-                        shouldCheckLoginStatus = false
-                        onLogout()
-                    }
+                    Task { await logout() }
                 } label: {
                     Label(
                         "Sign Out",
@@ -113,6 +77,44 @@ struct MapView: View {
         .overlay(alignment: .top) {
             DiagnosticsView(positioning: positioning)
         }
+    }
+
+    private func logout() async {
+        positioning.stop()
+
+        let response = await AF.request(
+            "https://analytics-\(selectedRegion).walkbase.com/api/j/logout",
+            method: .post
+        )
+        .validate()
+        // TODO: Remove when backend is fixed. (#82)
+        .serializingData(emptyResponseCodes: [200])
+        .response
+
+        switch response.result {
+        case .success:
+            logger.info("Successfully signed out")
+        case .failure(let error):
+            if let statusCode = response.response?.statusCode {
+                logger.error("HTTP status code: \(statusCode)")
+            }
+
+            if let data = response.data,
+                let serverMessage = String(
+                    data: data,
+                    encoding: .utf8
+                )
+            {
+                logger.error("Server message: \(serverMessage)")
+            }
+
+            logger.error("Error signing out: \(error)")
+            SentrySDK.capture(error: error)
+        }
+
+        // We should still sign out in the app even if the actual sign out fails.
+        shouldCheckLoginStatus = false
+        onLogout()
     }
 }
 
