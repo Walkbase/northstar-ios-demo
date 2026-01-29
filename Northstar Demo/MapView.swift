@@ -14,6 +14,8 @@ struct MapView: View {
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
+    @State private var positioningStatus: String = ""
+
     var body: some View {
         TileOverlayMapView(
             positioning: positioning,
@@ -28,13 +30,33 @@ struct MapView: View {
                 print(error)
             }
         }
-        // TODO: Improve if we loose our position. (#40)
-        .overlay {
-            if positioning.position == nil {
-                ProgressView {
-                    Text("Positioning...")
-                }
+        .onChange(of: positioning.status) { _, status in
+            switch status {
+            case .connectingToStream:
+                positioningStatus = "⏳ Connecting"
+            case .receivingUpdates:
+                positioningStatus = "✅ Tracking your position"
+            case .reconnecting:
+                positioningStatus = "⏳ Reconnecting"
+            case .starting:
+                positioningStatus = "⏳ Starting"
+            case .stopped:
+                positioningStatus = "⏹️ Stopped"
+            case .waitingForNetwork:
+                positioningStatus = "⏳ Waiting for internet connection"
+            case .waitingForUpdates:
+                positioningStatus = "⏳ Finding your position"
+            @unknown default:
+                positioningStatus = "❌ Something went wrong"
             }
+        }
+        .overlay(alignment: .bottom) {
+            Text(positioningStatus)
+                .font(.caption)
+                .bold()
+                .padding(8)
+                .background(.background)
+                .clipShape(.rect(cornerRadius: 8))
         }
         .overlay(alignment: .topLeading) {
             Menu {
