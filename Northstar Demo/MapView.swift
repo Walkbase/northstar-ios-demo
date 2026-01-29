@@ -64,6 +64,34 @@ struct MapView: View {
         }
         .overlay(alignment: .topLeading) {
             Menu {
+                if positioning.status == .stopped {
+                    Button {
+                        Task {
+                            do {
+                                try await positioning.start()
+                            } catch {
+                                alertMessage =
+                                    "Could not start positioning.\n\nPlease check your internet connection and try again."
+                                showAlert = true
+                            }
+                        }
+                    } label: {
+                        Label(
+                            "Start Positioning",
+                            systemImage: "play"
+                        )
+                    }
+                } else {
+                    Button {
+                        positioning.stop()
+                    } label: {
+                        Label(
+                            "Stop Positioning",
+                            systemImage: "stop"
+                        )
+                    }
+                }
+
                 Button {
                     Task { await logout() }
                 } label: {
