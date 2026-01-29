@@ -232,7 +232,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
         var annotation: MKPointAnnotation?
         var floorID: Int?
 
-        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay)
+        func mapView(_ mapView: MKMapView, rendererFor overlay: any MKOverlay)
             -> MKOverlayRenderer
         {
             if let tileOverlay = overlay as? MKTileOverlay {
