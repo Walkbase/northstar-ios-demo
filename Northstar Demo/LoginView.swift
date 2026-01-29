@@ -241,7 +241,7 @@ struct LoginView: View {
         }
         .task {
             if shouldCheckLoginStatus {
-                await logIn()
+                await login()
             }
         }
     }
@@ -250,10 +250,10 @@ struct LoginView: View {
 
     private func submit() async {
         focusedField = nil
-        await logIn()
+        await login()
     }
 
-    private func logIn() async {
+    private func login() async {
         isLoading = true
 
         let request = {
