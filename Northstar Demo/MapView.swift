@@ -20,11 +20,13 @@ struct MapView: View {
             selectedRegion: selectedRegion
         )
         .ignoresSafeArea()
-        .onAppear {
-            positioning.start(
-                in: selectedRegion,
-                apiKey: apiKey
-            )
+        .task {
+            do {
+                try await positioning.start()
+            } catch {
+                // TODO: Show alert and call logout.
+                print(error)
+            }
         }
         // TODO: Improve if we loose our position. (#40)
         .overlay {
@@ -375,11 +377,17 @@ extension Diagnostic {
 // MARK: Previews
 
 #Preview {
-    @Previewable var positioning = Positioning()
+    @Previewable var positioning = Positioning(
+        apiKey: "mock-api-key",
+        region: .dev
+    )
     MapView(onLogout: {}, positioning: positioning)
 }
 
 #Preview {
-    @Previewable var positioning = Positioning()
+    @Previewable var positioning = Positioning(
+        apiKey: "mock-api-key",
+        region: .dev
+    )
     MapView(onLogout: {}, positioning: positioning).preferredColorScheme(.dark)
 }

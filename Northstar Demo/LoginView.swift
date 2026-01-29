@@ -287,27 +287,16 @@ struct LoginView: View {
             return
         }
 
-        do {
-            let positioning = Positioning()
-            try await positioning.registerDevice(
-                in: selectedRegion,
-                apiKey: apiKey,
-                // TODO: What casing should we use? (#20, SDK)
-                userID: "northstar-demo"
-            )
+        let positioning = Positioning(
+            apiKey: apiKey,
+            region: selectedRegion
+        )
 
-            withAnimation(.easeInOut) {
-                onLogin(positioning)
-            } completion: {
-                isLoading = false
-                shouldCheckLoginStatus = true
-            }
-        } catch {
+        withAnimation(.easeInOut) {
+            onLogin(positioning)
+        } completion: {
             isLoading = false
-            alertMessage =
-                "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
-            showAlert = true
-            shouldCheckLoginStatus = false
+            shouldCheckLoginStatus = true
         }
     }
 }
