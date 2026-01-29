@@ -75,8 +75,7 @@ struct MapView: View {
 
                         switch response.result {
                         case .success:
-                            shouldCheckLoginStatus = false
-                            onLogout()
+                            logger.info("Successfully signed out")
                         case .failure(let error):
                             if let statusCode = response.response?.statusCode {
                                 logger.error("HTTP status code: \(statusCode)")
@@ -91,9 +90,13 @@ struct MapView: View {
                                 logger.error("Server message: \(serverMessage)")
                             }
 
-                            logger.error("Error: \(error)")
+                            logger.error("Error signing out: \(error)")
                             SentrySDK.capture(error: error)
                         }
+
+                        // We should still sign out in the app even if the actual sign out fails.
+                        shouldCheckLoginStatus = false
+                        onLogout()
                     }
                 } label: {
                     Label(
