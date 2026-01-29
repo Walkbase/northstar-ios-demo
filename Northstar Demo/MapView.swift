@@ -14,63 +14,86 @@ struct MapView: View {
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
+    @State private var positioningStatus: String = ""
+
+    @State private var alertMessage = ""
+    @State private var showAlert = false
+
     var body: some View {
         TileOverlayMapView(
             positioning: positioning,
             selectedRegion: selectedRegion
         )
         .ignoresSafeArea()
-        .onAppear {
-            positioning.start(
-                in: selectedRegion,
-                apiKey: apiKey
-            )
-        }
-        // TODO: Improve if we loose our position. (#40)
-        .overlay {
-            if positioning.position == nil {
-                ProgressView {
-                    Text("Positioning...")
-                }
+        .task {
+            do {
+                try await positioning.start()
+            } catch {
+                alertMessage =
+                    "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
+                showAlert = true
             }
+        }
+        .onChange(of: positioning.status) { _, status in
+            switch status {
+            case .connectingToStream:
+                positioningStatus = "⏳ Connecting"
+            case .receivingUpdates:
+                positioningStatus = "✅ Tracking your position"
+            case .reconnecting:
+                positioningStatus = "⏳ Reconnecting"
+            case .starting:
+                positioningStatus = "⏳ Starting"
+            case .stopped:
+                positioningStatus = "⏹️ Stopped"
+            case .waitingForNetwork:
+                positioningStatus = "⏳ Waiting for internet connection"
+            case .waitingForUpdates:
+                positioningStatus = "⏳ Finding your position"
+            @unknown default:
+                positioningStatus = "❌ Something went wrong"
+            }
+        }
+        .overlay(alignment: .bottom) {
+            Text(positioningStatus)
+                .font(.caption)
+                .bold()
+                .padding(8)
+                .background(.background)
+                .clipShape(.rect(cornerRadius: 8))
         }
         .overlay(alignment: .topLeading) {
             Menu {
-                Button {
-                    Task {
-                        positioning.stop()
-
-                        let response = await AF.request(
-                            "https://analytics-\(selectedRegion).walkbase.com/api/j/logout",
-                            method: .post
-                        )
-                        .validate()
-                        // TODO: Remove when backend is fixed. (#82)
-                        .serializingData(emptyResponseCodes: [200])
-                        .response
-
-                        switch response.result {
-                        case .success:
-                            shouldCheckLoginStatus = false
-                            onLogout()
-                        case .failure(let error):
-                            if let statusCode = response.response?.statusCode {
-                                logger.error("HTTP status code: \(statusCode)")
+                if positioning.status == .stopped {
+                    Button {
+                        Task {
+                            do {
+                                try await positioning.start()
+                            } catch {
+                                alertMessage =
+                                    "Could not start positioning.\n\nPlease check your internet connection and try again."
+                                showAlert = true
                             }
-
-                            if let data = response.data,
-                                let serverMessage = String(
-                                    data: data,
-                                    encoding: .utf8
-                                )
-                            {
-                                logger.error("Server message: \(serverMessage)")
-                            }
-
-                            logger.error("Error: \(error)")
-                            SentrySDK.capture(error: error)
                         }
+                    } label: {
+                        Label(
+                            "Start Positioning",
+                            systemImage: "play"
+                        )
                     }
+                } else {
+                    Button {
+                        positioning.stop()
+                    } label: {
+                        Label(
+                            "Stop Positioning",
+                            systemImage: "stop"
+                        )
+                    }
+                }
+
+                Button {
+                    Task { await logout() }
                 } label: {
                     Label(
                         "Sign Out",
@@ -86,6 +109,51 @@ struct MapView: View {
         .overlay(alignment: .top) {
             DiagnosticsView(positioning: positioning)
         }
+        .alert("Something Went Wrong", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                Task { await logout() }
+            }
+        } message: {
+            Text(alertMessage)
+        }
+    }
+
+    private func logout() async {
+        positioning.stop()
+
+        let response = await AF.request(
+            "https://analytics-\(selectedRegion).walkbase.com/api/j/logout",
+            method: .post
+        )
+        .validate()
+        // TODO: Remove when backend is fixed. (#82)
+        .serializingData(emptyResponseCodes: [200])
+        .response
+
+        switch response.result {
+        case .success:
+            logger.info("Successfully signed out")
+        case .failure(let error):
+            if let statusCode = response.response?.statusCode {
+                logger.error("HTTP status code: \(statusCode)")
+            }
+
+            if let data = response.data,
+                let serverMessage = String(
+                    data: data,
+                    encoding: .utf8
+                )
+            {
+                logger.error("Server message: \(serverMessage)")
+            }
+
+            logger.error("Error signing out: \(error)")
+            SentrySDK.capture(error: error)
+        }
+
+        // We should still sign out in the app even if the actual sign out fails.
+        shouldCheckLoginStatus = false
+        onLogout()
     }
 }
 
@@ -132,7 +200,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
 
                 let urlTemplate =
                     "https://analytics-\(selectedRegion).walkbase.com/tiles/\(floor.tiles.id)/{z}/{x}/{y}.\(floor.tiles.format)"
-                // `MKTileOverlay` causes constant high CPU usage when displaying tiles overlays,
+                // ⚠️ `MKTileOverlay` causes constant high CPU usage when displaying tiles overlays,
                 // seemingly with no workaround, and being the only available built-in alternative.
                 let overlay = MKTileOverlay(urlTemplate: urlTemplate)
                 overlay.maximumZ = floor.tiles.max_zoom
@@ -375,11 +443,17 @@ extension Diagnostic {
 // MARK: Previews
 
 #Preview {
-    @Previewable var positioning = Positioning()
+    @Previewable var positioning = Positioning(
+        apiKey: "mock-api-key",
+        region: .dev
+    )
     MapView(onLogout: {}, positioning: positioning)
 }
 
 #Preview {
-    @Previewable var positioning = Positioning()
+    @Previewable var positioning = Positioning(
+        apiKey: "mock-api-key",
+        region: .dev
+    )
     MapView(onLogout: {}, positioning: positioning).preferredColorScheme(.dark)
 }

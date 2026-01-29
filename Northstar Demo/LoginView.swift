@@ -1,4 +1,5 @@
 import Alamofire
+import Logging
 import Northstar
 import SwiftUI
 
@@ -240,7 +241,7 @@ struct LoginView: View {
         }
         .task {
             if shouldCheckLoginStatus {
-                await logIn()
+                await login()
             }
         }
     }
@@ -249,10 +250,10 @@ struct LoginView: View {
 
     private func submit() async {
         focusedField = nil
-        await logIn()
+        await login()
     }
 
-    private func logIn() async {
+    private func login() async {
         isLoading = true
 
         let request = {
@@ -287,30 +288,38 @@ struct LoginView: View {
             return
         }
 
-        do {
-            let positioning = Positioning()
-            try await positioning.registerDevice(
-                in: selectedRegion,
-                apiKey: apiKey,
-                // TODO: What casing should we use? (#20, SDK)
-                userID: "northstar-demo"
-            )
+        let positioning = Positioning(
+            apiKey: apiKey,
+            region: selectedRegion,
+            logger: logger
+        )
 
-            withAnimation(.easeInOut) {
-                onLogin(positioning)
-            } completion: {
-                isLoading = false
-                shouldCheckLoginStatus = true
-            }
-        } catch {
+        withAnimation(.easeInOut) {
+            onLogin(positioning)
+        } completion: {
             isLoading = false
-            alertMessage =
-                "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
-            showAlert = true
-            shouldCheckLoginStatus = false
+            shouldCheckLoginStatus = true
         }
     }
 }
+
+private struct DemoLogger: Northstar.Logger {
+    private let swiftLogger = Logger(
+        label: Bundle.main.bundleIdentifier ?? "N/A"
+    )
+
+    func error(_ message: String) {
+        swiftLogger.error(Logger.Message(stringLiteral: message))
+    }
+    func info(_ message: String) {
+        swiftLogger.info(Logger.Message(stringLiteral: message))
+    }
+    func warning(_ message: String) {
+        swiftLogger.warning(Logger.Message(stringLiteral: message))
+    }
+}
+
+private let logger = DemoLogger()
 
 // MARK: Previews
 
