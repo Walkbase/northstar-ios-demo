@@ -11,7 +11,6 @@ struct LoginView: View {
     @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
     let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
-    // TODO: Can we auto-select this based on your location? (#50).
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
 
     @AppStorage("apiKey") var apiKey = ""
