@@ -6,7 +6,7 @@ struct BasicUsageView: View {
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
 
     @State private var positioning: Positioning?
-    @State private var positioningStatus: String = ""
+    @State private var positioningStatus: String = "Positioning not started"
 
     @State private var isLoading = false
 
