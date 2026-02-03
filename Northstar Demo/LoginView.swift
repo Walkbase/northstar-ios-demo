@@ -8,25 +8,22 @@ struct LoginView: View {
 
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
 
-    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
-
     let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
-    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
-
     @AppStorage("apiKey") var apiKey = ""
     @AppStorage("email") var email = ""
-    @State private var password = ""
+    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
+    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
     @State private var hideInput = true
-    @State private var isLoading = false
-    @State private var rotate = false
+    @State private var password = ""
 
     @State private var alertMessage = ""
     @State private var showAlert = false
 
-    enum Field {
-        case apiKey, email, password
-    }
+    @State private var isLoading = false
+    @State private var rotate = false
+
+    enum Field { case apiKey, email, password }
     @FocusState private var focusedField: Field?
     /// Due to some SwiftUI limitation/bug, you can't animate directly off `@FocusState` changes.
     /// Fade-out (when focus is set) will animate, but fade-in (when focus clears) does not.
@@ -175,7 +172,7 @@ struct LoginView: View {
                             Divider().background(.white)
                         }
 
-                        Divider().background(.clear)
+                        Divider().hidden()
 
                         Button {
                             Task { await submit() }
