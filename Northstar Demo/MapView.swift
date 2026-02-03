@@ -213,7 +213,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
                             latitude: position.lat,
                             longitude: position.lng
                         ),
-                        // TODO: Calculate from polygon if possible. Or maybe we can zoom in on the overlay directly? (#39)
+                        // Too complicated to calculate for this demo.
                         fromDistance: 200,
                         pitch: 0,
                         heading: floor.bearing

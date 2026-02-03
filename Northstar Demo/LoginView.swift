@@ -8,26 +8,21 @@ struct LoginView: View {
 
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
 
-    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
-
-    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
-    // TODO: Can we auto-select this based on your location? (#50).
-    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
-
     @AppStorage("apiKey") var apiKey = ""
     @AppStorage("email") var email = ""
-    @State private var password = ""
+    @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
+    @AppStorage("shouldCheckLoginStatus") var shouldCheckLoginStatus = false
 
     @State private var hideInput = true
-    @State private var isLoading = false
-    @State private var rotate = false
+    @State private var password = ""
 
     @State private var alertMessage = ""
     @State private var showAlert = false
 
-    enum Field {
-        case apiKey, email, password
-    }
+    @State private var isLoading = false
+    @State private var rotate = false
+
+    enum Field { case apiKey, email, password }
     @FocusState private var focusedField: Field?
     /// Due to some SwiftUI limitation/bug, you can't animate directly off `@FocusState` changes.
     /// Fade-out (when focus is set) will animate, but fade-in (when focus clears) does not.
@@ -63,9 +58,9 @@ struct LoginView: View {
 
                     VStack {
                         Picker("Region", selection: $selectedRegion) {
-                            ForEach(regions, id: \.self) { region in
-                                Text(region.rawValue.uppercased())
-                                    .tag(region)
+                            ForEach(Northstar.Region.allCases, id: \.self) {
+                                region in
+                                Text(region.rawValue.uppercased()).tag(region)
                             }
                         }
                         .pickerStyle(.segmented)
@@ -176,7 +171,7 @@ struct LoginView: View {
                             Divider().background(.white)
                         }
 
-                        Divider().background(.clear)
+                        Divider().hidden()
 
                         Button {
                             Task { await submit() }
@@ -213,6 +208,7 @@ struct LoginView: View {
                             .scaledToFit()
                             .frame(maxWidth: 200)
                             .transition(.opacity)
+                            .padding(.bottom)
                     }
                 }
                 .frame(
