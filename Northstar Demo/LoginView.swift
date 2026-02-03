@@ -212,6 +212,7 @@ struct LoginView: View {
                             .scaledToFit()
                             .frame(maxWidth: 200)
                             .transition(.opacity)
+                            .padding(.bottom)
                     }
                 }
                 .frame(
