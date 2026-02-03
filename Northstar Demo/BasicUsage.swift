@@ -4,7 +4,6 @@ import SwiftUI
 struct BasicUsageView: View {
     @AppStorage("apiKey") var apiKey = ""
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
-    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
 
     @State private var positioning: Positioning?
     @State private var positioningStatus: String = ""
@@ -21,7 +20,7 @@ struct BasicUsageView: View {
 
                 Text("Region:")
                 Picker("Region", selection: $selectedRegion) {
-                    ForEach(regions, id: \.self) { region in
+                    ForEach(Northstar.Region.allCases, id: \.self) { region in
                         Text(region.rawValue.uppercased()).tag(region)
                     }
                 }

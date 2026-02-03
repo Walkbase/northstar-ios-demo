@@ -8,7 +8,6 @@ struct LoginView: View {
 
     @Environment(\.defaultMinListRowHeight) private var defaultMinListRowHeight
 
-    let regions: [Northstar.Region] = [.dev, .eu, .uk, .us]
     @AppStorage("apiKey") var apiKey = ""
     @AppStorage("email") var email = ""
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
@@ -59,9 +58,9 @@ struct LoginView: View {
 
                     VStack {
                         Picker("Region", selection: $selectedRegion) {
-                            ForEach(regions, id: \.self) { region in
-                                Text(region.rawValue.uppercased())
-                                    .tag(region)
+                            ForEach(Northstar.Region.allCases, id: \.self) {
+                                region in
+                                Text(region.rawValue.uppercased()).tag(region)
                             }
                         }
                         .pickerStyle(.segmented)
