@@ -177,8 +177,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
         guard let position = positioning.position else { return }
 
         let coordinate = CLLocationCoordinate2D(
-            latitude: position.lat,
-            longitude: position.lng
+            latitude: position.latitude,
+            longitude: position.longitude
         )
 
         if let annotation = context.coordinator.annotation {
@@ -189,7 +189,7 @@ private struct TileOverlayMapView: UIViewRepresentable {
             context.coordinator.annotation = annotation
         }
 
-        let floorID = position.floor_id
+        let floorID = position.floorID
         if floorID != context.coordinator.floorID {
             context.coordinator.floorID = floorID
 
@@ -210,8 +210,8 @@ private struct TileOverlayMapView: UIViewRepresentable {
                 mapView.setCamera(
                     MKMapCamera(
                         lookingAtCenter: CLLocationCoordinate2D(
-                            latitude: position.lat,
-                            longitude: position.lng
+                            latitude: position.latitude,
+                            longitude: position.longitude
                         ),
                         // Too complicated to calculate for this demo.
                         fromDistance: 200,
