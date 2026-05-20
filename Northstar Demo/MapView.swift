@@ -28,6 +28,7 @@ struct MapView: View {
         .task {
             do {
                 try await positioning.start()
+                UIApplication.shared.isIdleTimerDisabled = true
             } catch {
                 alertMessage =
                     "We could sign you in, but could not validate your API key.\n\nPlease check your API key and try again."
@@ -69,6 +70,7 @@ struct MapView: View {
                         Task {
                             do {
                                 try await positioning.start()
+                                UIApplication.shared.isIdleTimerDisabled = true
                             } catch {
                                 alertMessage =
                                     "Could not start positioning.\n\nPlease check your internet connection and try again."
@@ -84,6 +86,7 @@ struct MapView: View {
                 } else {
                     Button {
                         positioning.stop()
+                        UIApplication.shared.isIdleTimerDisabled = false
                     } label: {
                         Label(
                             "Stop Positioning",
@@ -120,6 +123,7 @@ struct MapView: View {
 
     private func logout() async {
         positioning.stop()
+        UIApplication.shared.isIdleTimerDisabled = false
 
         let response = await AF.request(
             "https://analytics-\(selectedRegion).walkbase.com/api/j/logout",

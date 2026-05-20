@@ -146,7 +146,7 @@ struct BasicUsageView: View {
         do {
             try await positioning.start(userID: "User 123")
             self.positioning = positioning
-
+            UIApplication.shared.isIdleTimerDisabled = true
         } catch {
             alertMessage =
                 "We could not validate your API key.\n\nPlease check your internet connection, chosen region, API key and try again."
@@ -158,6 +158,7 @@ struct BasicUsageView: View {
 
     private func stop() {
         positioning?.stop()
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 }
 
