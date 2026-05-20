@@ -116,7 +116,7 @@ struct BasicUsageView: View {
                 Group {
                     if let position = positioning?.position {
                         Text(
-                            "Timestamp: \(position.timestamp)\nLatitude: \(position.lat)\nLongitude: \(position.lng)"
+                            "Timestamp: \(position.timestamp)\nLatitude: \(position.latitude)\nLongitude: \(position.longitude)"
                         )
                     } else {
                         Text("None received yet")
