@@ -6,7 +6,7 @@ struct BasicUsageView: View {
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
 
     @State private var positioning: Positioning?
-    @State private var positioningStatus: String = "Positioning not started"
+    @State private var positioningStatus = ""
 
     @State private var isLoading = false
 
@@ -14,89 +14,95 @@ struct BasicUsageView: View {
     @State private var showAlert = false
 
     var body: some View {
-        Grid(alignment: .leading) {
-            GridRow {
-                var isDisabled: Bool { positioning != nil }
+        VStack(alignment: .leading) {
+            Grid(alignment: .leading) {
+                GridRow {
+                    var isDisabled: Bool { positioning != nil }
 
-                Text("Region:")
-                Picker("Region", selection: $selectedRegion) {
-                    ForEach(Northstar.Region.allCases, id: \.self) { region in
-                        Text(region.rawValue.uppercased()).tag(region)
-                    }
-                }
-                .border(.blue)
-                .disabled(isDisabled)
-                .opacity(isDisabled ? 0.5 : 1)
-            }
-
-            GridRow {
-                var isDisabled: Bool { positioning != nil }
-
-                Text("API Key:")
-                TextField("", text: $apiKey)
-                    .border(.blue)
-                    .submitLabel(.go)
-                    .disabled(isDisabled)
-                    .opacity(isDisabled ? 0.5 : 1)
-            }
-            .onSubmit { Task { await start() } }
-
-            GridRow {
-                var canStart: Bool {
-                    positioning == nil || positioning?.status == .stopped
-                }
-
-                Button {
-                    Task { canStart ? await start() : stop() }
-                } label: {
-                    Group {
-                        if isLoading {
-                            ProgressView().tint(.white)
-                        } else {
-                            Text(canStart ? "Start" : "Stop")
+                    Text("Region:")
+                    Picker("Region", selection: $selectedRegion) {
+                        ForEach(Northstar.Region.allCases, id: \.self) {
+                            region in
+                            Text(region.rawValue.uppercased()).tag(region)
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .foregroundStyle(.white)
-                    .background(.blue)
-                    .textCase(.uppercase)
-                    .fontWeight(.bold)
-                }
-                .gridCellColumns(2)
-            }
-
-            GridRow {
-                var isDisabled: Bool {
-                    positioning == nil || positioning?.status != .stopped
+                    .border(.blue)
+                    .disabled(isDisabled)
+                    .opacity(isDisabled ? 0.5 : 1)
                 }
 
-                Button {
-                    positioning = nil
-                } label: {
-                    Text("Reset")
+                GridRow {
+                    var isDisabled: Bool { positioning != nil }
+
+                    Text("API Key:")
+                    TextField("", text: $apiKey)
+                        .border(.blue)
+                        .submitLabel(.go)
+                        .disabled(isDisabled)
+                        .opacity(isDisabled ? 0.5 : 1)
+                }
+                .onSubmit { Task { await start() } }
+
+                GridRow {
+                    var canStart: Bool {
+                        positioning == nil || positioning?.status == .stopped
+                    }
+
+                    Button {
+                        Task { canStart ? await start() : stop() }
+                    } label: {
+                        Group {
+                            if isLoading {
+                                ProgressView().tint(.white)
+                            } else {
+                                Text(canStart ? "Start" : "Stop")
+                            }
+                        }
                         .frame(maxWidth: .infinity)
                         .padding()
                         .foregroundStyle(.white)
                         .background(.blue)
                         .textCase(.uppercase)
                         .fontWeight(.bold)
+                    }
+                    .gridCellColumns(2)
                 }
-                .gridCellColumns(2)
-                .disabled(isDisabled)
-                .opacity(isDisabled ? 0.5 : 1)
+
+                GridRow {
+                    var isDisabled: Bool {
+                        positioning == nil || positioning?.status != .stopped
+                    }
+
+                    Button {
+                        positioning = nil
+                    } label: {
+                        Text("Reset")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.blue)
+                            .textCase(.uppercase)
+                            .fontWeight(.bold)
+                    }
+                    .gridCellColumns(2)
+                    .disabled(isDisabled)
+                    .opacity(isDisabled ? 0.5 : 1)
+                }
             }
 
             Divider().hidden()
 
-            GridRow {
-                Text("Status:")
+            VStack(alignment: .leading) {
+                Text("Status").font(.headline)
                 Text(positioningStatus)
+                if let isStationary = positioning?.isStationary {
+                    Text(isStationary ? "🧍 Stationary" : "🚶 In motion")
+                }
             }
-            .onChange(of: positioning?.status) { _, status in
+            .onChange(of: positioning?.status, initial: true) { _, status in
                 switch status {
                 case .none:
-                    positioningStatus = "Positioning not started"
+                    positioningStatus = "⏱️ Positioning not started"
                 case .stopped:
                     positioningStatus = "⏹️ Positioning stopped"
                 case .connectingToStream, .reconnecting, .starting,
@@ -111,15 +117,29 @@ struct BasicUsageView: View {
                 }
             }
 
-            GridRow(alignment: .top) {
-                Text("Position:")
-                Group {
-                    if let position = positioning?.position {
-                        Text(
-                            "Timestamp: \(position.timestamp)\nLatitude: \(position.latitude)\nLongitude: \(position.longitude)"
-                        )
-                    } else {
-                        Text("None received yet")
+            Divider().hidden()
+
+            Grid(alignment: .leading) {
+                if let position = positioning?.position {
+                    GridRow {
+                        Text("Latest position")
+                            .font(.headline)
+                            .gridCellColumns(2)
+                    }
+
+                    GridRow {
+                        Text("Timestamp")
+                        Text(position.timestamp)
+                    }
+
+                    GridRow {
+                        Text("Latitude")
+                        Text("\(position.latitude)")
+                    }
+
+                    GridRow {
+                        Text("Longitude")
+                        Text("\(position.longitude)")
                     }
                 }
             }
