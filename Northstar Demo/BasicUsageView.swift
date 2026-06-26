@@ -88,41 +88,58 @@ struct BasicUsageView: View {
                     .disabled(isDisabled)
                     .opacity(isDisabled ? 0.5 : 1)
                 }
+            }
 
-                Divider().hidden()
+            Divider().hidden()
 
-                GridRow {
-                    Text("Status:")
-                    Text(positioningStatus)
+            VStack(alignment: .leading) {
+                Text("Status").font(.headline)
+                Text(positioningStatus)
+                if let isStationary = positioning?.isStationary {
+                    Text(isStationary ? "🧍 Stationary" : "🚶 In motion")
                 }
-                .onChange(of: positioning?.status) { _, status in
-                    switch status {
-                    case .none:
-                        positioningStatus = "Positioning not started"
-                    case .stopped:
-                        positioningStatus = "⏹️ Positioning stopped"
-                    case .connectingToStream, .reconnecting, .starting,
-                        .waitingForNetwork:
-                        positioningStatus = "⏳ Positioning starting"
-                    case .waitingForUpdates:
-                        positioningStatus = "⏳ Finding your position"
-                    case .receivingUpdates:
-                        positioningStatus = "✅ Tracking your position"
-                    @unknown default:
-                        positioningStatus = "❌ Something went wrong"
+            }
+            .onChange(of: positioning?.status) { _, status in
+                switch status {
+                case .none:
+                    positioningStatus = "Positioning not started"
+                case .stopped:
+                    positioningStatus = "⏹️ Positioning stopped"
+                case .connectingToStream, .reconnecting, .starting,
+                    .waitingForNetwork:
+                    positioningStatus = "⏳ Positioning starting"
+                case .waitingForUpdates:
+                    positioningStatus = "⏳ Finding your position"
+                case .receivingUpdates:
+                    positioningStatus = "✅ Tracking your position"
+                @unknown default:
+                    positioningStatus = "❌ Something went wrong"
+                }
+            }
+
+            Divider().hidden()
+
+            Grid(alignment: .leading) {
+                if let position = positioning?.position {
+                    GridRow {
+                        Text("Latest position")
+                            .font(.headline)
+                            .gridCellColumns(2)
                     }
-                }
 
-                GridRow(alignment: .top) {
-                    Text("Position:")
-                    Group {
-                        if let position = positioning?.position {
-                            Text(
-                                "Timestamp: \(position.timestamp)\nLatitude: \(position.latitude)\nLongitude: \(position.longitude)"
-                            )
-                        } else {
-                            Text("None received yet")
-                        }
+                    GridRow {
+                        Text("Timestamp")
+                        Text(position.timestamp)
+                    }
+
+                    GridRow {
+                        Text("Latitude")
+                        Text("\(position.latitude)")
+                    }
+
+                    GridRow {
+                        Text("Longitude")
+                        Text("\(position.longitude)")
                     }
                 }
             }
