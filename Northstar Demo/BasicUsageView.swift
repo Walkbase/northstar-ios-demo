@@ -6,7 +6,7 @@ struct BasicUsageView: View {
     @AppStorage("selectedRegion") var selectedRegion: Northstar.Region = .dev
 
     @State private var positioning: Positioning?
-    @State private var positioningStatus: String = "Positioning not started"
+    @State private var positioningStatus = ""
 
     @State private var isLoading = false
 
@@ -99,10 +99,10 @@ struct BasicUsageView: View {
                     Text(isStationary ? "🧍 Stationary" : "🚶 In motion")
                 }
             }
-            .onChange(of: positioning?.status) { _, status in
+            .onChange(of: positioning?.status, initial: true) { _, status in
                 switch status {
                 case .none:
-                    positioningStatus = "Positioning not started"
+                    positioningStatus = "⏱️ Positioning not started"
                 case .stopped:
                     positioningStatus = "⏹️ Positioning stopped"
                 case .connectingToStream, .reconnecting, .starting,
